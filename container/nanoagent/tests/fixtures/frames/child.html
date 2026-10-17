@@ -1,0 +1,26 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Frame fixture — child</title>
+<style>
+  body { font: 14px system-ui, sans-serif; margin: 0; padding: 16px; background: #f6f6f6; }
+  button { padding: 8px 12px; font: inherit; cursor: pointer; }
+  #claimed { font-weight: 600; color: #1a7f37; min-height: 20px; }
+  iframe { display: block; margin-top: 16px; width: 520px; height: 130px; border: 2px dashed #aaa; }
+</style>
+<p>Child frame</p>
+<!-- The control this test is about. Its label carries a token minted for THIS run, so a
+     model that has memorised the page cannot produce it, and clicking it changes state the
+     harness reads off the page rather than out of the model's answer. -->
+<button id="claim">Claim __CHILD_TOKEN__</button>
+<div id="claimed"></div>
+<label>Child field <input id="child-input" placeholder="child"></label>
+<iframe id="inner" src="__GRANDCHILD_URL__" title="inner frame"></iframe>
+<script>
+  document.getElementById('claim').addEventListener('click', ev => {
+    // isTrusted is recorded, not just the click: a synthetic event would claim the button
+    // too, and the whole point of the CDP input path is that this says true.
+    document.getElementById('claimed').textContent =
+      'CLAIMED __CHILD_TOKEN__ trusted=' + ev.isTrusted;
+    window.__nc_fixture_claim = { token: '__CHILD_TOKEN__', isTrusted: ev.isTrusted };
+  });
+</script>

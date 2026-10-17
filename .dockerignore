@@ -1,0 +1,13 @@
+node_modules
+dist
+data
+store
+groups
+container
+dashboard/node_modules
+dashboard/dist
+.env
+*.log
+.git
+.gitignore
+.dockerignore

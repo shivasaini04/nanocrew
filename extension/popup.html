@@ -1,0 +1,38 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>NanoCrew Bridge</title>
+<style>
+  body { font: 13px system-ui, sans-serif; width: 300px; margin: 0; padding: 14px; }
+  h1 { font-size: 14px; margin: 0 0 10px; }
+  h2 { font-size: 12px; margin: 16px 0 6px; text-transform: uppercase; letter-spacing: .04em; color: #555; }
+  .row { display: flex; gap: 8px; align-items: center; margin: 8px 0; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: #bbb; flex: none; }
+  .dot.on { background: #1a7f37; }
+  input[type=text] { flex: 1; min-width: 0; padding: 5px 7px; font: inherit; }
+  textarea { width: 100%; box-sizing: border-box; min-height: 62px; padding: 5px 7px; font: 12px ui-monospace, monospace; resize: vertical; }
+  button { padding: 6px 10px; font: inherit; cursor: pointer; }
+  button.stop { color: #a40e26; }
+  .muted { color: #666; font-size: 12px; line-height: 1.45; margin: 6px 0 0; }
+  .saved { color: #1a7f37; font-size: 12px; }
+  hr { border: 0; border-top: 1px solid #e5e5e5; margin: 14px 0 0; }
+</style>
+<h1>NanoCrew Bridge</h1>
+<div class="row"><span class="dot" id="dot"></span><span id="status">not connected</span></div>
+<div class="row"><input type="text" id="server" placeholder="https://nanocrew.example.com"></div>
+<div class="row">
+  <button id="connect">Connect</button>
+  <button id="disconnect" class="stop" title="Cancels anything running and refuses new commands until you connect again">Stop</button>
+</div>
+<p class="muted" id="hint">Sign in to the dashboard in this browser first — the bridge registers as you.</p>
+
+<hr>
+<h2>Sites agents may touch</h2>
+<textarea id="allowlist" placeholder="one host per line&#10;example.com&#10;mail.example.com" spellcheck="false"></textarea>
+<div class="row">
+  <label><input type="checkbox" id="allowall"> Allow every site</label>
+  <button id="save">Save</button>
+  <span class="saved" id="saved"></span>
+</div>
+<p class="muted">A host covers its subdomains. Anything not listed is refused — including
+reading the page — so an agent cannot look at a tab you did not allow.</p>
+<script src="popup.js"></script>

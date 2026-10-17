@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "NanoCrew Browser Bridge",
+  "version": "0.1.0",
+  "description": "Lets a NanoCrew agent work in this browser, in tabs you can see, using the sessions you are already signed into.",
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "NanoCrew Bridge"
+  },
+  "permissions": [
+    "scripting",
+    "tabs",
+    "storage",
+    "debugger"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ]
+}

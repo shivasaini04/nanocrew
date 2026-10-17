@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+.npm-cache/
+# Build output
+dist/
+# Python artifacts (e.g. sidecar_runner.py compiled during local testing)
+__pycache__/
+*.pyc
+
+# Local data & auth
+store/
+data/
+logs/
+
+# Groups - only track base structure and specific CLAUDE.md files
+groups/*
+!groups/main/
+!groups/global/
+groups/main/*
+groups/global/*
+!groups/main/CLAUDE.md
+!groups/global/CLAUDE.md
+!groups/global/IDENTITY.md
+
+# Docker build context copies of nanobot (copied before docker build, not tracked)
+
+# Secrets
+*.keys.json
+.env
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+
+# Skills system (local per-installation state)
+.nanocrew/
+
+agents-sdk-docs
+
+# eval run output
+evals/results/

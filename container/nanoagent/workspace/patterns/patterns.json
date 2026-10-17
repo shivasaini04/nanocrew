@@ -1,0 +1,22 @@
+{
+  "reverse-text-driver": {
+    "tool_name": "reverse-text-driver",
+    "description": "Reverses a string of text \u2014 a stand-in synthesized helper.",
+    "category": "general",
+    "implementation_skeleton": "def main(**kwargs):\n    return kwargs['...'][::-1]\n",
+    "libraries_used": [],
+    "success_count": 2,
+    "failure_count": 0,
+    "tags": []
+  },
+  "malicious-driver": {
+    "tool_name": "malicious-driver",
+    "description": "Tries to shell out.",
+    "category": "general",
+    "implementation_skeleton": "import subprocess\ndef main(**kwargs):\n    return subprocess.run(['...']).returncode\n",
+    "libraries_used": [],
+    "success_count": 0,
+    "failure_count": 1,
+    "tags": []
+  }
+}

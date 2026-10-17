@@ -1,0 +1,690 @@
+/* ============================================================
+   nanocrew Dashboard — Crew Redesign System
+   An artisan warm palette, in two themes.
+
+   THEMING CONTRACT — read before adding colour anywhere:
+
+   1. Never write a raw colour in a component. Every colour must come from a
+      token below, either as var(--cr-*) or via the CR object in lib/cr.ts
+      (which is just a JS alias for these same vars). A raw hex or rgba() is a
+      pixel that stays dark when the user picks light mode.
+
+   2. The theme is selected by data-theme on <html>, set pre-paint by the inline
+      script in index.html and thereafter by stores/themeStore.ts. Dark lives in
+      :root so it stays the fallback if that attribute is ever missing.
+
+   3. Tokens are SEMANTIC, not literal. --cr-tint-3 means "a faint wash of the
+      foreground over a surface" — white in dark mode, warm ink in light mode.
+      It flips. Reach for the role you want, not the colour you can picture.
+
+   4. Two things deliberately do NOT flip: --cr-on-accent (text sitting on an
+      orange fill, white in both) and the --cr-syntax-* set (code highlighting
+      keeps its hues, tuned per theme for contrast).
+   ============================================================ */
+
+:root,
+:root[data-theme='dark'] {
+  /* Backgrounds */
+  --cr-bg-sidebar: #0d0a05;
+  --cr-bg-main: #090704;
+  --cr-bg-card: #131009;
+  --cr-bg-card-hov: #1a1510;
+  --cr-bg-surf: #100d07;
+  --cr-bg-elevated: #181309;
+
+  /* Borders */
+  --cr-border: rgba(194, 65, 12, 0.12);
+  --cr-border-bright: rgba(194, 65, 12, 0.3);
+  --cr-border-sub: rgba(255, 255, 255, 0.05);
+
+  /* Accents */
+  --cr-accent: #c2410c;
+  --cr-accent-warm: #e05a1e;
+  --cr-accent-low: rgba(194, 65, 12, 0.09);
+  /* Bare channels, for the rare rgba(var(--cr-accent-rgb), a) call site. */
+  --cr-accent-rgb: 194, 65, 12;
+  /* Accent fills at fixed opacities. These replace the `${CR.accent}30` hex-alpha
+     concatenation trick, which silently produced invalid CSS once the tokens
+     became var() references. */
+  --cr-accent-15: rgba(194, 65, 12, 0.09);
+  --cr-accent-25: rgba(194, 65, 12, 0.15);
+  --cr-accent-30: rgba(194, 65, 12, 0.19);
+  --cr-accent-40: rgba(194, 65, 12, 0.25);
+  --cr-accent-60: rgba(194, 65, 12, 0.38);
+  /* Text/icons sitting ON an accent fill — white in both themes, because the
+     fill underneath is the same orange either way. */
+  --cr-on-accent: #ffffff;
+
+  /* Text & States */
+  --cr-cream: #f5ede0;
+  --cr-text: #e8dece;
+  --cr-sub: #9a7e6a;
+  /* The dim end of the text ramp, raised for legibility.
+     --cr-muted was #4a3a2a — 1.85:1 on the page, below even the 3:1 floor for
+     non-text elements. It is also the most-used colour in the dashboard (587
+     call sites) and lands overwhelmingly at 9-12px, where thin strokes have
+     the least pixel area to carry a difference. Timestamps, counters and
+     labels were effectively unreadable outside a dark room.
+     Now 3.70:1 — roughly double, while keeping the theme's low-key feel.
+     --cr-muted-br moved too, and had to: at its old 2.72:1 it would have been
+     *dimmer* than the new muted and inverted the ramp. The three dim steps
+     stay ordered muted < muted-br < sub (3.70 < 4.63 < 5.34). */
+  --cr-muted: #7a6553;
+  --cr-muted-br: #8d7565;
+  --cr-placeholder: rgba(255, 255, 255, 0.28);
+
+  --cr-green: #4ade80;
+  --cr-green-low: rgba(74, 222, 128, 0.08);
+  --cr-green-line: rgba(74, 222, 128, 0.25);
+  --cr-amber: #f59e0b;
+  --cr-amber-low: rgba(245, 158, 11, 0.08);
+  --cr-amber-line: rgba(245, 158, 11, 0.25);
+  --cr-blue: #60a5fa;
+  --cr-blue-low: rgba(96, 165, 250, 0.08);
+  --cr-blue-line: rgba(96, 165, 250, 0.3);
+  --cr-cyan-low: rgba(56, 189, 248, 0.08);
+  --cr-cyan-line: rgba(56, 189, 248, 0.3);
+  --cr-purple: #a78bfa;
+  --cr-purple-low: rgba(167, 139, 250, 0.1);
+  --cr-purple-line: rgba(167, 139, 250, 0.25);
+  --cr-red: #f43f5e;
+  --cr-red-low: rgba(244, 63, 94, 0.08);
+  --cr-red-line: rgba(244, 63, 94, 0.3);
+  --cr-cyan: #38bdf8;
+  /* Error text/borders. Two weights because the codebase uses a lighter red for
+     inline copy and a stronger one for solid fills and rules. */
+  --cr-error: #f87171;
+  --cr-error-str: #ef4444;
+  --cr-error-low: rgba(248, 113, 113, 0.08);
+  --cr-error-line: rgba(248, 113, 113, 0.3);
+  --cr-warn: #fbbf24;
+  --cr-orange: #fb923c;
+  --cr-pink: #f472b6;
+  /* Third-party brand colour — identical in both themes by definition. */
+  --cr-brand-whatsapp: #25d366;
+
+  /* Surface tints — a wash of the FOREGROUND over a surface. Six steps from
+     barely-there to clearly-filled. White here, warm ink in light mode, so
+     "subtly lighter than the card" becomes "subtly darker than the card"
+     without a single component knowing which theme it's in. */
+  --cr-tint-1: rgba(255, 255, 255, 0.02);
+  --cr-tint-2: rgba(255, 255, 255, 0.03);
+  --cr-tint-3: rgba(255, 255, 255, 0.04);
+  --cr-tint-4: rgba(255, 255, 255, 0.06);
+  --cr-tint-5: rgba(255, 255, 255, 0.08);
+  --cr-tint-6: rgba(255, 255, 255, 0.12);
+  --cr-line: rgba(255, 255, 255, 0.10);
+  --cr-line-str: rgba(255, 255, 255, 0.22);
+
+  /* Recessed wells — inputs, code blocks, anything that should read as cut INTO
+     the surface. On dark that means black; on light it must NOT (a black code
+     block on cream is a hole in the page), so light overrides these with a warm
+     ink wash rather than flipping the alpha. */
+  --cr-well: rgba(0, 0, 0, 0.25);
+  --cr-well-str: rgba(0, 0, 0, 0.4);
+
+  /* Scrims & shadows — stay dark in both themes, just softer on light. */
+  --cr-scrim: rgba(0, 0, 0, 0.7);
+  --cr-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --cr-shadow-md: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+  --cr-shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.7);
+  /* Shadow COLOURS, for the many one-off box-shadows that carry their own
+     geometry. Substituting the colour alone keeps each shadow's bespoke offset
+     and blur while letting light mode soften and warm it. */
+  --cr-shade-1: rgba(0, 0, 0, 0.2);
+  --cr-shade-2: rgba(0, 0, 0, 0.35);
+  --cr-shade-3: rgba(0, 0, 0, 0.55);
+  --cr-shade-4: rgba(0, 0, 0, 0.85);
+
+  /* Code syntax — hues hold across themes, lightness is tuned per theme. */
+  --cr-syntax-key: #c084fc;
+  --cr-syntax-str: #86efac;
+  --cr-syntax-num: #fbbf24;
+  --cr-syntax-com: #6a5040;
+  --cr-syntax-fn: #60a5fa;
+
+  /* Typography */
+  --cr-font-serif: 'DM Serif Display', serif;
+  --cr-font-sans: 'DM Sans', sans-serif;
+  --cr-font-mono: 'JetBrains Mono', monospace;
+
+  /* Layout */
+  --cr-page-padding-h: 60px;
+  --cr-page-padding-v: 40px;
+  --cr-page-padding-bottom: 40px;
+}
+
+/* --- Light theme: warm paper ---------------------------------------------
+   Cream page, white cards, warm ink. Same burnt-orange accent as dark, so the
+   product still looks like itself. Text steps were picked against the page
+   colour for WCAG AA (4.5:1) rather than eyeballed: sub 7.6:1, muted-br 6.3:1,
+   muted 4.8:1 — muted stays the least prominent of the three, matching the
+   hierarchy it has in dark mode. Status hues are darkened hard (#4ade80 on
+   cream is 1.6:1 — effectively invisible) to their 700-weight equivalents. */
+:root[data-theme='light'] {
+  /* Sidebar sits one step down from the page so nav reads as chrome. Kept light
+     enough that status hues on it still clear 4.5:1 — at #f3ece1 they landed at
+     ~4.3 and every coloured label in the nav failed. */
+  --cr-bg-sidebar: #f8f3ec;
+  --cr-bg-main: #faf7f2;
+  --cr-bg-card: #ffffff;
+  --cr-bg-card-hov: #f7f1e8;
+  --cr-bg-surf: #ffffff;
+  --cr-bg-elevated: #ffffff;
+
+  --cr-border: rgba(194, 65, 12, 0.16);
+  --cr-border-bright: rgba(194, 65, 12, 0.38);
+  --cr-border-sub: rgba(61, 41, 24, 0.10);
+
+  --cr-accent: #c2410c;
+  /* accent-warm carries links and inline code; #e05a1e is only 3.7:1 on paper,
+     so light mode uses a deeper orange (7.3:1) for the same role. */
+  --cr-accent-warm: #9a3412;
+  --cr-accent-low: rgba(194, 65, 12, 0.07);
+  --cr-accent-rgb: 194, 65, 12;
+  --cr-accent-15: rgba(194, 65, 12, 0.10);
+  --cr-accent-25: rgba(194, 65, 12, 0.16);
+  --cr-accent-30: rgba(194, 65, 12, 0.21);
+  --cr-accent-40: rgba(194, 65, 12, 0.28);
+  --cr-accent-60: rgba(194, 65, 12, 0.42);
+  --cr-on-accent: #ffffff;
+
+  --cr-cream: #1f1710;
+  --cr-text: #2f2419;
+  --cr-sub: #5f4c3d;
+  --cr-muted: #7f6a5a;
+  --cr-muted-br: #6b5747;
+  --cr-placeholder: rgba(61, 41, 24, 0.62);
+
+  --cr-green: #15803d;
+  --cr-green-low: rgba(21, 128, 61, 0.10);
+  --cr-green-line: rgba(21, 128, 61, 0.28);
+  --cr-amber: #b45309;
+  --cr-amber-low: rgba(180, 83, 9, 0.10);
+  --cr-amber-line: rgba(180, 83, 9, 0.28);
+  --cr-blue: #1d4ed8;
+  --cr-blue-low: rgba(29, 78, 216, 0.09);
+  --cr-blue-line: rgba(29, 78, 216, 0.3);
+  --cr-cyan-low: rgba(3, 105, 161, 0.09);
+  --cr-cyan-line: rgba(3, 105, 161, 0.3);
+  --cr-purple: #6d28d9;
+  --cr-purple-low: rgba(109, 40, 217, 0.09);
+  --cr-purple-line: rgba(109, 40, 217, 0.28);
+  --cr-red: #be123c;
+  --cr-red-low: rgba(190, 18, 60, 0.09);
+  --cr-red-line: rgba(190, 18, 60, 0.3);
+  --cr-cyan: #0369a1;
+  /* red-400/500 sit at 2.5:1 and 3.3:1 on paper — an error message nobody can
+     read. Light mode drops to red-600/700. */
+  --cr-error: #b91c1c;
+  --cr-error-str: #991b1b;
+  --cr-error-low: rgba(185, 28, 28, 0.08);
+  --cr-error-line: rgba(185, 28, 28, 0.3);
+  --cr-warn: #b45309;
+  --cr-orange: #c2410c;
+  --cr-pink: #be185d;
+
+  /* Warm ink rather than pure black, so tinted surfaces stay in the paper
+     family instead of going grey. */
+  --cr-tint-1: rgba(61, 41, 24, 0.025);
+  --cr-tint-2: rgba(61, 41, 24, 0.04);
+  --cr-tint-3: rgba(61, 41, 24, 0.055);
+  --cr-tint-4: rgba(61, 41, 24, 0.075);
+  --cr-tint-5: rgba(61, 41, 24, 0.10);
+  --cr-tint-6: rgba(61, 41, 24, 0.14);
+  --cr-line: rgba(61, 41, 24, 0.12);
+  --cr-line-str: rgba(61, 41, 24, 0.24);
+
+  --cr-well: rgba(61, 41, 24, 0.05);
+  --cr-well-str: rgba(61, 41, 24, 0.08);
+
+  --cr-scrim: rgba(40, 26, 15, 0.45);
+  --cr-shadow-sm: 0 2px 8px rgba(70, 45, 25, 0.10);
+  --cr-shadow-md: 0 10px 30px -10px rgba(70, 45, 25, 0.22);
+  --cr-shadow-lg: 0 24px 60px rgba(70, 45, 25, 0.18);
+  /* Far weaker than dark's equivalents: a 0.85-black shadow that reads as depth
+     on a near-black page reads as a smudge on paper. */
+  --cr-shade-1: rgba(70, 45, 25, 0.07);
+  --cr-shade-2: rgba(70, 45, 25, 0.12);
+  --cr-shade-3: rgba(70, 45, 25, 0.18);
+  --cr-shade-4: rgba(70, 45, 25, 0.28);
+
+  --cr-syntax-key: #7c3aed;
+  --cr-syntax-str: #15803d;
+  --cr-syntax-num: #b45309;
+  --cr-syntax-com: #9c8878;
+  --cr-syntax-fn: #1d4ed8;
+}
+
+/* --- Legacy token aliases -------------------------------------------------
+   An earlier naming scheme (--text-muted, --border-subtle, --radius-md, …) is
+   still referenced from 22 components, but was never actually defined anywhere.
+   Those declarations have been silently invalid this whole time — a
+   `border: 1px solid var(--border-subtle)` resolves to nothing and the browser
+   drops the entire border. That is 302 dead references, ~42 of them missing
+   borders, in dark mode as much as light.
+
+   Defining them as aliases fixes both themes at once and keeps the diff to this
+   block rather than rewriting 302 call sites. Because they point at --cr-*
+   rather than at literals, they theme correctly for free.
+
+   New code should use the --cr-* names directly; this block is here to make
+   existing markup render, not to be built on. */
+:root {
+  --text-primary: var(--cr-cream);
+  --text-secondary: var(--cr-sub);
+  --text-muted: var(--cr-muted);
+
+  --bg-base: var(--cr-bg-main);
+  --bg-elevated: var(--cr-bg-elevated);
+  --cr-bg: var(--cr-bg-main);
+  --cr-bg-panel: var(--cr-bg-card);
+  --cr-surface: var(--cr-bg-surf);
+  --cr-surface2: var(--cr-bg-card);
+  --cr-surface3: var(--cr-bg-elevated);
+
+  --border-subtle: var(--cr-border-sub);
+  --border-default: var(--cr-border);
+
+  --accent-green: var(--cr-green);
+  --accent-red: var(--cr-red);
+  --accent-amber: var(--cr-amber);
+  --accent-blue: var(--cr-blue);
+  --accent-purple: var(--cr-purple);
+  --accent-cyan: var(--cr-cyan);
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --font-size-sm: 12px;
+  --font-size-xl: 18px;
+}
+
+/* --- Base & Reset --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--cr-bg-main);
+  color: var(--cr-text);
+  font-family: var(--cr-font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Native <select> dropdowns follow the document's color-scheme, which themeStore
+   sets on <html> — so options are legible in both themes without a hardcoded
+   dark override here. The explicit colours keep the popup in the warm palette
+   instead of the browser's default grey. */
+select option { background: var(--cr-bg-elevated); color: var(--cr-cream); }
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  color: inherit;
+}
+
+textarea, input {
+  font-family: inherit;
+  color: inherit;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cr-tint-5);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cr-tint-6);
+}
+
+/* --- Animations --- */
+@keyframes crewPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.45; transform: scale(0.82); }
+}
+
+@keyframes crewBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+@keyframes crewFadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes crewFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes crewSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* --- Utility Classes --- */
+.font-serif { font-family: var(--cr-font-serif); }
+.font-mono { font-family: var(--cr-font-mono); }
+.font-sans { font-family: var(--cr-font-sans); }
+
+.premium-card {
+  background: var(--cr-bg-surf);
+  border: 1px solid var(--cr-border);
+  transition: all 0.15s;
+}
+
+.premium-card:hover {
+  background: var(--cr-bg-card-hov);
+}
+
+/* --- Dashboard Layout --- */
+.dashboard-layout {
+  display: flex;
+  width: 100vw;
+  /* 100vh on mobile Chrome/Safari measures the viewport as if the browser's address bar
+     and gesture-nav strip were hidden — actual visible height is smaller, so anything
+     pinned to the bottom (like a chat input) ends up rendered underneath that chrome.
+     100dvh tracks the real visible viewport; the 100vh line is the fallback for browsers
+     that don't support dvh yet. */
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--cr-bg-main);
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.page-content {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--cr-bg-main);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.crew-page-container {
+  padding: var(--cr-page-padding-v) var(--cr-page-padding-h) var(--cr-page-padding-bottom);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: min-content;
+}
+
+/* --- Mobile (≤860px) --- */
+/* On mobile the sidebar is an off-canvas drawer (position:fixed), so it leaves the flex
+   flow and .main-content already fills the width — no width override needed here. */
+.topbar-hide-mobile { display: inline; }
+
+@media (max-width: 860px) {
+  /* These page-padding variables are read directly by inline styles across many pages
+     (hero sections, stat grids, etc.) — overriding them here is what actually shrinks
+     those gutters on mobile, since a page's own inline `var(--cr-page-padding-h)` isn't
+     touched by overriding the .crew-page-container class alone. */
+  :root {
+    --cr-page-padding-h: 16px;
+    --cr-page-padding-v: 20px;
+    --cr-page-padding-bottom: 40px;
+  }
+  /* Tighter page gutters so content isn't crushed on a phone. */
+  .crew-page-container {
+    padding: 16px 14px 40px;
+  }
+  /* Hide the account email in the topbar — the hamburger + bell + log-out already fit. */
+  .topbar-hide-mobile { display: none; }
+  /* Never let a page force the whole shell to scroll sideways; wide content scrolls
+     inside its own container instead. */
+  .page-content { overflow-x: hidden; }
+}
+
+/* --- Modals --- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--cr-scrim);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: crewFadeIn 0.3s ease-out;
+}
+
+.modal-container {
+  background: var(--cr-bg-elevated);
+  border: 1px solid var(--cr-border-bright);
+  box-shadow: var(--cr-shadow-lg);
+  position: relative;
+  animation: crewFadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 90vw;
+  max-height: 94vh;
+  overflow-y: auto;
+}
+
+/* --- Crew Specific Elements --- */
+/* The hero fades from a slightly raised surface into the page. --cr-bg-card-hov
+   is that "one step off the page" colour in both themes (lighter on dark, warmer
+   on light), so the gradient direction inverts correctly on its own. */
+.hero-gradient {
+  background: linear-gradient(180deg, var(--cr-bg-card-hov) 0%, var(--cr-bg-main) 100%);
+  border-bottom: 1px solid var(--cr-border);
+}
+
+/* Prose for markdown — rich, readable document theme */
+.prose {
+  font-family: var(--cr-font-sans);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--cr-sub);
+  word-break: break-word;
+}
+.prose > :first-child { margin-top: 0; }
+.prose > :last-child { margin-bottom: 0; }
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  font-family: var(--cr-font-serif);
+  color: var(--cr-cream);
+  line-height: 1.25;
+  margin-top: 1.6em;
+  margin-bottom: 0.6em;
+  font-weight: 600;
+}
+.prose h1 { font-size: 1.7em; letter-spacing: -0.01em; }
+.prose h2 {
+  font-size: 1.35em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--cr-border);
+}
+.prose h3 { font-size: 1.12em; color: var(--cr-text); }
+.prose h4 { font-size: 1em; color: var(--cr-text); }
+.prose h5, .prose h6 {
+  font-size: 0.85em; color: var(--cr-muted-br);
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+
+.prose p { margin: 0 0 1em; }
+.prose strong { color: var(--cr-cream); font-weight: 650; }
+.prose em { color: var(--cr-text); }
+
+.prose a {
+  color: var(--cr-accent-warm);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: var(--cr-line-str);
+}
+.prose a:hover { text-decoration-color: var(--cr-accent-warm); }
+
+.prose ul, .prose ol { margin: 0 0 1em; padding-left: 1.4em; }
+.prose li { margin: 0.3em 0; padding-left: 0.2em; }
+.prose li::marker { color: var(--cr-accent); }
+.prose li > ul, .prose li > ol { margin: 0.3em 0; }
+.prose input[type="checkbox"] { margin-right: 0.5em; accent-color: var(--cr-accent); }
+
+.prose blockquote {
+  margin: 1.2em 0;
+  padding: 0.5em 1em;
+  border-left: 3px solid var(--cr-accent);
+  background: var(--cr-tint-1);
+  border-radius: 0 6px 6px 0;
+  color: var(--cr-muted-br);
+  font-style: italic;
+}
+.prose blockquote p:last-child { margin-bottom: 0; }
+
+.prose hr {
+  border: none;
+  height: 1px;
+  background: var(--cr-border);
+  margin: 2em 0;
+}
+
+/* Tables — the big readability win */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.3em 0;
+  font-size: 0.92em;
+  border: 1px solid var(--cr-border);
+  border-radius: 8px;
+  overflow: hidden;
+  display: table;
+}
+.prose thead { background: var(--cr-tint-3); }
+.prose th {
+  text-align: left;
+  font-family: var(--cr-font-sans);
+  font-weight: 650;
+  color: var(--cr-cream);
+  padding: 9px 13px;
+  border-bottom: 1px solid var(--cr-border-bright);
+  white-space: nowrap;
+}
+.prose td {
+  padding: 8px 13px;
+  border-bottom: 1px solid var(--cr-border-sub);
+  vertical-align: top;
+  color: var(--cr-sub);
+}
+.prose tbody tr:nth-child(even) { background: var(--cr-tint-1); }
+.prose tbody tr:hover { background: var(--cr-tint-2); }
+.prose tbody tr:last-child td { border-bottom: none; }
+
+.prose img { max-width: 100%; border-radius: 8px; margin: 1em 0; }
+
+.prose pre {
+  background: var(--cr-well);
+  border: 1px solid var(--cr-border);
+  padding: 14px 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 1.3em 0;
+  line-height: 1.55;
+}
+.prose code {
+  font-family: var(--cr-font-mono);
+  font-size: 0.88em;
+  background: var(--cr-well);
+  border: 1px solid var(--cr-border);
+  color: var(--cr-accent-warm);
+  padding: 1.5px 5px;
+  border-radius: 4px;
+}
+.prose pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--cr-sub);
+  font-size: 12.5px;
+}
+
+/* --- Agent chat markdown (.agent-md) --- */
+.agent-md { font-family: var(--cr-font-sans); font-size: 13.5px; line-height: 1.75; color: var(--cr-text); }
+.agent-md p { margin: 0 0 0.75em; }
+.agent-md p:last-child { margin-bottom: 0; }
+.agent-md ul, .agent-md ol { margin: 0.5em 0 0.75em 1.2em; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.agent-md li { line-height: 1.6; }
+.agent-md li::marker { color: var(--cr-accent); }
+.agent-md h1, .agent-md h2, .agent-md h3 {
+  font-family: var(--cr-font-serif); color: var(--cr-cream);
+  margin: 1em 0 0.4em; font-weight: 400;
+}
+.agent-md h1 { font-size: 18px; }
+.agent-md h2 { font-size: 15px; }
+.agent-md h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--cr-sub); }
+.agent-md strong { color: var(--cr-cream); font-weight: 600; }
+.agent-md em { color: var(--cr-sub); font-style: italic; }
+.agent-md code {
+  font-family: var(--cr-font-mono); font-size: 12px;
+  background: var(--cr-well); border: 1px solid var(--cr-border);
+  padding: 1px 6px; border-radius: 4px; color: var(--cr-accent-warm);
+}
+.agent-md pre {
+  background: var(--cr-well-str); border: 1px solid var(--cr-border);
+  border-radius: 8px; padding: 12px 14px; margin: 0.75em 0;
+  overflow-x: auto;
+}
+.agent-md pre code {
+  background: none; border: none; padding: 0; color: var(--cr-sub); font-size: 11.5px;
+}
+.agent-md blockquote {
+  border-left: 3px solid var(--cr-accent); margin: 0.75em 0;
+  padding: 4px 0 4px 14px; color: var(--cr-sub); font-style: italic;
+}
+.agent-md hr { border: none; border-top: 1px solid var(--cr-border); margin: 1em 0; }
+.agent-md a { color: var(--cr-accent-warm); text-decoration: underline; text-underline-offset: 3px; }
+.agent-md table { width: 100%; border-collapse: collapse; margin: 0.75em 0; font-size: 12px; }
+.agent-md th { background: var(--cr-well); color: var(--cr-sub); font-family: var(--cr-font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--cr-border); }
+.agent-md td { padding: 6px 10px; border-bottom: 1px solid var(--cr-tint-3); color: var(--cr-text); }
+
+
+/* Chat input transparent text + placeholder styling for mention highlighting overlay */
+.chat-highlight-input {
+  color: transparent !important;
+  caret-color: var(--cr-cream) !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  resize: none;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+.chat-highlight-input::placeholder {
+  color: var(--cr-placeholder);
+}
+
+@keyframes typingDot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}

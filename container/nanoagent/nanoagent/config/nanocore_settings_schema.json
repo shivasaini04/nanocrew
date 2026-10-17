@@ -1,0 +1,222 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://nanocrew.ai/schemas/nanocrew-settings.json",
+  "title": "nanocrew Settings",
+  "description": "Runtime settings for the nanocrew agent loop. Place in <workspace>/.nanocrew/settings.json (team) or .nanocrew/settings.local.json (personal, gitignored).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference — add this to get IDE autocomplete."
+    },
+    "model": {
+      "type": "string",
+      "description": "Override the LLM model for this workspace. E.g. 'anthropic/claude-sonnet-4-6'."
+    },
+    "permissions": {
+      "type": "object",
+      "description": "Permission tier and rule engine configuration.",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "read_only",
+            "workspace_write",
+            "danger_full_access",
+            "prompt",
+            "allow"
+          ],
+          "default": "workspace_write",
+          "description": "Active permission tier. 'workspace_write' allows file read/write within the workspace. 'danger_full_access' also allows exec/spawn. 'prompt' asks the user for every tool call. 'allow' is for trusted Docker containers."
+        },
+        "rules": {
+          "type": "array",
+          "description": "Ordered list of allow/deny/ask rules. Evaluated before the tier check. Lists accumulate across config tiers.",
+          "items": {
+            "type": "object",
+            "required": [
+              "decision",
+              "pattern"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "decision": {
+                "type": "string",
+                "enum": [
+                  "allow",
+                  "deny",
+                  "ask"
+                ],
+                "description": "'allow' grants access, 'deny' blocks it, 'ask' prompts the user."
+              },
+              "pattern": {
+                "type": "string",
+                "description": "Glob pattern matched against 'tool_name' or 'tool_name:serialised_args'. Examples: 'exec:git *', 'write_file:*', 'exec:rm -rf*'."
+              }
+            }
+          }
+        }
+      }
+    },
+    "hooks": {
+      "type": "array",
+      "description": "Shell commands run at tool lifecycle events. Lists accumulate across config tiers.",
+      "items": {
+        "type": "object",
+        "required": [
+          "event",
+          "command"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "event": {
+            "type": "string",
+            "enum": [
+              "PreToolUse",
+              "PostToolUse",
+              "PostToolUseFailure"
+            ],
+            "description": "When to run this hook."
+          },
+          "command": {
+            "type": "string",
+            "description": "Shell command to run. Receives a JSON payload on stdin; should write a JSON result to stdout."
+          },
+          "matcher": {
+            "type": "string",
+            "default": "*",
+            "description": "Glob over tool name. Defaults to '*' (all tools)."
+          },
+          "timeout_ms": {
+            "type": "integer",
+            "default": 5000,
+            "description": "Milliseconds before the hook is killed."
+          },
+          "on_error": {
+            "type": "string",
+            "enum": [
+              "continue",
+              "deny"
+            ],
+            "default": "continue",
+            "description": "'continue' treats hook failures as warnings. 'deny' blocks the tool call on hook failure."
+          }
+        }
+      }
+    },
+    "compaction": {
+      "type": "object",
+      "description": "In-context message compaction settings.",
+      "additionalProperties": false,
+      "properties": {
+        "threshold_tokens": {
+          "type": "integer",
+          "default": 100000,
+          "description": "Compact the in-context message list when input tokens exceed this value. Set to 0 to disable."
+        },
+        "keep_tail": {
+          "type": "integer",
+          "default": 8,
+          "description": "Number of recent messages to preserve after compaction."
+        }
+      }
+    },
+    "telemetry": {
+      "type": "object",
+      "description": "Structured event logging.",
+      "additionalProperties": false,
+      "properties": {
+        "log_dir": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null,
+          "description": "Directory for JSONL telemetry files. Defaults to <workspace>/.nanocrew/telemetry/. Overridden by nanocrew_LOG_DIR env var."
+        },
+        "redact_content": {
+          "type": "boolean",
+          "default": false,
+          "description": "Strip message content from telemetry events, keeping structure. For regulated environments."
+        }
+      }
+    },
+    "mcp_servers": {
+      "type": "object",
+      "description": "Agent-level MCP servers spawned at startup (stdio transport).",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "command"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "Executable to spawn."
+          },
+          "args": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Arguments passed to command."
+          },
+          "env": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Extra environment variables for the server process."
+          },
+          "enabled": {
+            "type": "boolean",
+            "default": true
+          },
+          "startup_timeout_ms": {
+            "type": "integer",
+            "default": 10000
+          }
+        }
+      }
+    },
+    "tools": {
+      "type": "object",
+      "description": "Tool enable/disable configuration.",
+      "additionalProperties": false,
+      "properties": {
+        "disabled": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tool names to skip at registration time."
+        }
+      }
+    },
+    "credentials": {
+      "type": "object",
+      "description": "Service credentials for local dev (injected into env vars). Use only in settings.local.json — never commit secrets.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
+      },
+      "examples": [
+        {
+          "apollo": {
+            "api_key": "your-key"
+          },
+          "gmail": {
+            "client_id": "...",
+            "client_secret": "...",
+            "refresh_token": "..."
+          }
+        }
+      ]
+    }
+  }
+}

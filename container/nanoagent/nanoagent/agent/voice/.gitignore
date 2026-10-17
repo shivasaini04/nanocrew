@@ -1,0 +1,14 @@
+# Live credentials - never commit
+.env
+
+__pycache__/
+*.pyc
+
+# Generated audio (rebuild with: python tts.py)
+greeting.wav
+
+# Standalone tunnel binary (54MB) - re-download as needed
+tools/
+
+# Call recordings and server logs (contain call audio)
+logs/

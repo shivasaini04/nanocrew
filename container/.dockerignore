@@ -1,0 +1,37 @@
+# The agent image is built with `COPY nanoagent/ ./nanoagent/`, which takes the
+# directory verbatim. .gitignore does NOT apply to a Docker build context, so
+# anything ignored for git but present on disk still gets baked into the image
+# unless it is listed here.
+
+# Live credentials. agent/voice/.env holds real Gemini and Exotel keys during
+# local development; without this line every built agent image carries them.
+**/.env
+**/.env.*
+!**/.env.example
+
+# Local databases — agent/voice/voice_agent.db holds real call records and
+# transcripts, which are customer data and have no business in an image.
+**/*.db
+**/*.db-wal
+**/*.db-shm
+# ...but the vendored engine ships a READ-ONLY reference database of real WebGL
+# vendor/renderer pairs, and it is not customer data. The blanket rule above stripped
+# it from the build context, so COPY never saw it and the engine died at launch with
+# "sqlite3.OperationalError: unable to open database file" — a packaging fix in
+# pyproject.toml alone did not help, because the file was already gone before the
+# wheel was built. Re-include it explicitly rather than narrowing the rule above:
+# the secrets exclusion should stay blunt.
+# NB the doubled prefix: the build context root is container/, and the package lives
+# at container/nanoagent/nanoagent/... — a single "nanoagent/" here silently matches
+# nothing, which is exactly how this was wrong on the first attempt.
+!nanoagent/nanoagent/agent/effector/engine/webgl/webgl_data.db
+
+# Call recordings and server logs (call audio).
+**/logs/
+
+# Build/test noise that only inflates the image.
+**/__pycache__/
+**/*.pyc
+**/.pytest_cache/
+**/.venv/
+**/node_modules/

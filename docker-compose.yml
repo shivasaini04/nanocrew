@@ -1,0 +1,71 @@
+# NanoCrew: orchestrator + LiteLLM model gateway.
+#
+#   cp .env.example .env        # add at least one LLM key, set HOST_PROJECT_ROOT
+#   bash container/build.sh     # builds the agent sandbox image (nanocrew-agent:latest)
+#   npm install && npm run build
+#   docker compose up --build
+#
+# The orchestrator spawns agent containers through the Docker socket, so the paths it
+# passes to them must be HOST paths. Set HOST_PROJECT_ROOT in .env to the absolute path of
+# this checkout (for example /home/you/nanocrew or C:/Users/you/nanocrew).
+
+services:
+  nanocrew-orchestrator:
+    build:
+      context: .
+      dockerfile: Dockerfile.orchestrator
+    container_name: nanocrew-orchestrator
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data:/app/data
+      - ./store:/app/store
+      - ./groups:/app/groups
+      - ./container/nanoagent:/nanoagent:ro
+      - ./.env:/app/.env
+      # Host-compiled output, so a code change needs `npm run build` and a restart, not an image rebuild.
+      - ./dist:/app/dist
+    environment:
+      - HOST_PROJECT_ROOT=${HOST_PROJECT_ROOT:?set HOST_PROJECT_ROOT in .env to the absolute path of this checkout}
+      - HOST_NANOBOT_DIR=${HOST_PROJECT_ROOT}/container/nanoagent
+      - TZ=${TZ:-UTC}
+      - VERIFY_LOOP=${VERIFY_LOOP:-on}
+      - PLAN_FIRST_ENFORCE=${PLAN_FIRST_ENFORCE:-on}
+      - LEAN_EXPLORE=${LEAN_EXPLORE:-on}
+      - LITELLM_PROXY_URL=${LITELLM_PROXY_URL:-http://litellm:4000}
+      - LITELLM_PROXY_KEY=${LITELLM_PROXY_KEY:-sk-nanocrew-proxy}
+      - NANOBOT_PERSISTENT=${NANOBOT_PERSISTENT:-on}
+      - DEFERRED_TOOLS=${DEFERRED_TOOLS:-on}
+      - PERSISTENT_SESSION=${PERSISTENT_SESSION:-on}
+    command: sh -c "node --env-file=/app/.env dist/index.js"
+    depends_on:
+      - litellm
+
+  # Model gateway. Every Python and Node caller routes through it when LITELLM_PROXY_URL is set:
+  # provider keys stay out of agent containers, with fallback on 429/quota.
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    container_name: nanocrew-litellm
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./litellm_config.yaml:/app/config.yaml:ro
+    command: ["--config", "/app/config.yaml", "--port", "4000", "--num_workers", "2"]
+    environment:
+      - TZ=${TZ:-UTC}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - MOONSHOT_API_KEY=${MOONSHOT_KIMI_API_KEY:-}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - LITELLM_PROXY_KEY=${LITELLM_PROXY_KEY:-sk-nanocrew-proxy}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:4000/health/liveliness 2>/dev/null || exit 0"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s

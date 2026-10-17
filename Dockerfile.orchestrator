@@ -1,0 +1,38 @@
+# Stage 1: grab only the Docker CLI binary (avoids installing docker.io via apt)
+FROM docker:cli AS docker-cli
+
+# Stage 2: main orchestrator image
+FROM node:20
+
+# node:20 (Debian bookworm) already has python3, make, g++ — no apt-get needed for build tools.
+# We only need the docker CLI to talk to the host daemon via the mounted socket.
+COPY --from=docker-cli /usr/local/bin/docker /usr/local/bin/docker
+
+WORKDIR /app
+
+# Install Playwright Chromium + its Linux system deps FIRST, in its own layer, pinned to
+# the same version as the app's `playwright` dependency below. This is the slow step
+# (~170MB Chromium download), so it must sit ABOVE the app-deps copy — that way a change
+# to package.json busts `npm install` without re-triggering the browser download.
+# Bump this pin whenever the `playwright` version in package.json changes.
+RUN npx --yes playwright@1.59.1 install --with-deps chromium
+
+# Install Node dependencies (layer-cached — only re-runs when package*.json changes)
+COPY package*.json ./
+RUN npm install
+
+# Install dashboard (SPA) deps in their own cached layer. The orchestrator serves the
+# built dashboard as static files (src/api/server.ts → ../../dashboard/dist), so the SPA
+# MUST be built into the image: dashboard/dist is git- and docker-ignored and is never
+# present on a fresh server checkout. Without this, prod serves no login page.
+COPY dashboard/package*.json ./dashboard/
+RUN cd dashboard && npm install
+
+# Copy source and compile: orchestrator TS (npm run build), then the dashboard SPA.
+COPY . .
+RUN npm run build && cd dashboard && npm run build
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+    CMD wget -qO- http://localhost:3002/health || exit 1
+
+CMD ["npm", "run", "start"]

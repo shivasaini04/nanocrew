@@ -1,0 +1,76 @@
+# LiteLLM Proxy — NanoCrew model gateway
+# Keys are read from the container environment (see docker-compose.yml).
+# Clients authenticate with LITELLM_PROXY_KEY and send to http://litellm:4000/v1.
+
+model_list:
+
+  # ── DeepSeek ────────────────────────────────────────────────────────────────
+  - model_name: deepseek/deepseek-v4-flash
+    litellm_params:
+      model: deepseek/deepseek-v4-flash
+      api_key: os.environ/DEEPSEEK_API_KEY
+
+  - model_name: deepseek/deepseek-v4-pro
+    litellm_params:
+      model: deepseek/deepseek-v4-pro
+      api_key: os.environ/DEEPSEEK_API_KEY
+
+  # ── Google Gemini ────────────────────────────────────────────────────────────
+  - model_name: gemini/gemini-3.5-flash
+    litellm_params:
+      model: gemini/gemini-3.5-flash
+      api_key: os.environ/GEMINI_API_KEY
+
+  # ── Moonshot / Kimi ──────────────────────────────────────────────────────────
+  # .env stores the key as MOONSHOT_KIMI_API_KEY; the litellm container is passed
+  # MOONSHOT_API_KEY via an alias in docker-compose environment.
+  - model_name: moonshot/kimi-k2.5
+    litellm_params:
+      model: moonshot/kimi-k2.5
+      api_key: os.environ/MOONSHOT_API_KEY
+
+  - model_name: moonshot/moonshot-v1-8k-vision-preview
+    litellm_params:
+      model: moonshot/moonshot-v1-8k-vision-preview
+      api_key: os.environ/MOONSHOT_API_KEY
+
+  # ── Groq ─────────────────────────────────────────────────────────────────────
+  - model_name: groq/llama-3.3-70b-versatile
+    litellm_params:
+      model: groq/llama-3.3-70b-versatile
+      api_key: os.environ/GROQ_API_KEY
+
+  # ── Embeddings ──────────────────────────────────────────────────────────────
+  # Used by src/agents/embeddings.ts for semantic memory. `drop_params` is required: the AI SDK
+  # always sends `encoding_format: "float"`, which Gemini's embedding API rejects. It is scoped to
+  # this entry on purpose, so genuine bad-parameter errors on chat models still surface.
+  - model_name: gemini/gemini-embedding-001
+    litellm_params:
+      model: gemini/gemini-embedding-001
+      api_key: os.environ/GEMINI_API_KEY
+      drop_params: true
+
+  # ── OpenRouter (wildcard passthrough) ───────────────────────────────────────
+  # Any `openrouter/<provider>/<model>` string reaches OpenRouter with the suffix preserved.
+  - model_name: openrouter/*
+    litellm_params:
+      model: openrouter/*
+      api_key: os.environ/OPENROUTER_API_KEY
+
+router_settings:
+  num_retries: 2
+  retry_after: 3
+  # Automatic fallback when primary model hits quota / errors
+  fallbacks:
+    - deepseek/deepseek-v4-flash:
+        - gemini/gemini-3.5-flash
+        - groq/llama-3.3-70b-versatile
+    - deepseek/deepseek-v4-pro:
+        - deepseek/deepseek-v4-flash
+        - gemini/gemini-3.5-flash
+
+general_settings:
+  master_key: os.environ/LITELLM_PROXY_KEY
+  # Relaxes a DB-availability check only. A model still needs a model_list entry (exact or
+  # wildcard) to be routable.
+  allow_requests_on_db_unavailable: true

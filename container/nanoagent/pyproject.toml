@@ -1,0 +1,169 @@
+[project]
+name = "nanoagent-ai"
+version = "0.1.4.post2"
+description = "A lightweight personal AI assistant framework"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "nanoagent contributors"}
+]
+keywords = ["ai", "agent", "chatbot"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "typer>=0.20.0,<1.0.0",
+    "litellm>=1.81.5,<2.0.0",
+    # litellm imports orjson unguarded on some provider paths (DeepSeek/Groq) but does
+    # NOT declare it as a dependency, so a fresh image resolves without it and every
+    # LLM call dies with "No module named 'orjson'". Pin it explicitly.
+    "orjson>=3.10.0,<4.0.0",
+    "pydantic>=2.12.0,<3.0.0",
+    "pydantic-settings>=2.12.0,<3.0.0",
+    "websockets>=16.0,<17.0",
+    "websocket-client>=1.9.0,<2.0.0",
+    "httpx>=0.28.0,<1.0.0",
+    # Stage 60 phase 4: real .xlsx files an agent can hand to the user's computer.
+    "openpyxl>=3.1.0,<4.0.0",
+    "oauth-cli-kit>=0.1.3,<1.0.0",
+    "loguru>=0.7.3,<1.0.0",
+    "readability-lxml>=0.8.4,<1.0.0",
+    # DuckDuckGo search, the free unmetered leg of web_search. It was installed unpinned
+    # by container/Dockerfile and declared nowhere, so a breaking release would have
+    # landed on the next image build with nothing to stop it — and until stage 46 this
+    # was the ONLY provider actually serving searches in production.
+    "ddgs>=9.16.0,<10.0.0",
+    "rich>=14.0.0,<15.0.0",
+    "croniter>=6.0.0,<7.0.0",
+    "dingtalk-stream>=0.24.0,<1.0.0",
+    "python-telegram-bot[socks]>=22.0,<23.0",
+    "lark-oapi>=1.5.0,<2.0.0",
+    "socksio>=1.0.0,<2.0.0",
+    "python-socketio>=5.16.0,<6.0.0",
+    "msgpack>=1.1.0,<2.0.0",
+    "slack-sdk>=3.39.0,<4.0.0",
+    "slackify-markdown>=0.2.0,<1.0.0",
+    "qq-botpy>=1.2.0,<2.0.0",
+    "python-socks[asyncio]>=2.8.0,<3.0.0",
+    "prompt-toolkit>=3.0.50,<4.0.0",
+    "mcp>=1.26.0,<2.0.0",
+    "json-repair>=0.57.0,<1.0.0",
+    "rank-bm25>=0.2.2,<1.0.0",
+    "fastapi>=0.115.0,<1.0.0",
+    "uvicorn>=0.32.0,<1.0.0",
+    # Effector (stage43) — OCR fallback layer of the element resolver. tesseract-ocr
+    # is the matching system package, installed in container/Dockerfile.
+    "pytesseract>=0.3.13,<1.0.0",
+    "Pillow>=11.0.0,<12.0.0",
+    "playwright>=1.62.0",
+    # Voice (agent/voice) — outbound calling.
+    # pytz: the TRAI 9am-9pm calling window is defined in IST, and the gate that
+    # enforces it is a legal constraint, so the timezone cannot be approximated
+    # with a UTC offset (India has no DST, but the gate must still be explicit).
+    "pytz>=2024.1",
+    # google-genai: the Gemini Live speech-to-speech client. NanoCrew supplies this
+    # API key centrally (users bring their carrier account, not AI capacity).
+    "google-genai>=0.3.0",
+    # Used by agent/voice's HTTP paths (company profile fetch, engine calls). Already
+    # present transitively via litellm; declared because voice imports it directly.
+    "aiohttp>=3.9.3",
+    # Effector Inlined Native Engine (our Camoufox fork — agent/effector/engine/).
+    # Vendored deliberately rather than pip-installed: we intend to modify the engine
+    # (AI-driven control, new capabilities), so it is ours to change. That means its
+    # dependencies are ours to declare too — nothing else pulls them in.
+    "browserforge>=1.2.4",
+    "numpy>=1.24.0",
+    "ua-parser>=0.18.0",
+    "platformdirs>=3.0.0",
+    "screeninfo>=0.8.1",
+    "language-tags>=1.2.0",
+    # engine/__main__.py and engine/multiversion.py import rich_click; without it the
+    # `python -m ...effector.engine fetch` build step cannot run at all.
+    "rich-click>=1.7.0",
+    # engine/virtdisplay.py — the engine's own headful-on-Xvfb path.
+    "pyvirtualdisplay>=3.0",
+]
+
+[project.optional-dependencies]
+matrix = [
+    "matrix-nio[e2e]>=0.25.2",
+    "mistune>=3.0.0,<4.0.0",
+    "nh3>=0.2.17,<1.0.0",
+]
+dev = [
+    "pytest>=9.0.0,<10.0.0",
+    "pytest-asyncio>=1.3.0,<2.0.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+nanoagent = "nanoagent.cli.commands:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["nanoagent"]
+
+[tool.hatch.build.targets.wheel.sources]
+"nanoagent" = "nanoagent"
+
+# Include non-Python files in skills and templates
+[tool.hatch.build]
+include = [
+    "nanoagent/**/*.py",
+    "nanoagent/templates/**/*.md",
+    "nanoagent/skills/**/*.md",
+    "nanoagent/skills/**/*.sh",
+    # The vendored engine (agent/effector/engine/) is data-driven: it reads its WebGL
+    # sample database, fingerprint presets, font/voice/locale tables and repo config at
+    # runtime. This include list is an allowlist, so anything not named here is dropped
+    # from the wheel — and the engine then fails at launch with errors that name a
+    # missing DB rather than a missing package file.
+    #
+    # Found 2026-08-31: webgl/webgl_data.db was absent from the installed image and the
+    # engine died with "sqlite3.OperationalError: unable to open database file". The
+    # top-level .json/.yml files happened to be present, which made the gap look like a
+    # sqlite problem instead of a packaging one.
+    "nanoagent/agent/effector/engine/**/*.db",
+    "nanoagent/agent/effector/engine/**/*.json",
+    "nanoagent/agent/effector/engine/**/*.yml",
+    "nanoagent/agent/effector/engine/**/*.xml",
+    "nanoagent/agent/effector/engine/**/*.js",
+    "nanoagent/agent/effector/engine/**/*.qml",
+    "nanoagent/agent/effector/engine/**/*.cfg",
+    # .ttf matters for more than completeness: font metrics are measured, not read, so
+    # a missing bundled font changes the rendered-text fingerprint.
+    "nanoagent/agent/effector/engine/**/*.ttf",
+    "nanoagent/agent/effector/engine/**/*.ico",
+    "nanoagent/agent/effector/engine/**/py.typed",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "nanoagent/",
+    "bridge/",
+    "README.md",
+    "LICENSE",
+]
+
+[tool.hatch.build.targets.wheel.force-include]
+"bridge" = "nanoagent/bridge"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

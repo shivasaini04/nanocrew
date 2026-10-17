@@ -1,0 +1,14 @@
+{
+  "name": "nanocrew-companion",
+  "version": "0.1.0",
+  "description": "Runs on your machine and lends a NanoCrew agent your browser.",
+  "type": "module",
+  "main": "index.mjs",
+  "scripts": {
+    "start": "node index.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.59.1",
+    "ws": "^8.21.3"
+  }
+}

@@ -1,0 +1,18 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Frame fixture — parent</title>
+<style>
+  body { font: 14px system-ui, sans-serif; margin: 0; padding: 24px; }
+  h1 { font-size: 18px; margin: 0 0 12px; }
+  input { padding: 6px 8px; font: inherit; width: 320px; }
+  iframe { display: block; margin-top: 18px; width: 640px; height: 320px; border: 2px solid #888; }
+  .pad { height: 40px; }
+</style>
+<h1>Frame fixture — parent</h1>
+<p>Parent token: <b id="parent-token">__PARENT_TOKEN__</b></p>
+<label>Parent field <input id="parent-input" placeholder="type here"></label>
+<div class="pad"></div>
+<!-- Cross-origin on purpose: the parent is served from one hostname and the child from the
+     other, so this frame boundary is a real origin boundary rather than a same-origin one
+     a parent could simply reach through. -->
+<iframe id="outer" src="__CHILD_URL__" title="outer frame"></iframe>
