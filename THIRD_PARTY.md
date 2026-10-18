@@ -26,7 +26,6 @@ Each skill's `SKILL.md` front matter names its author and license. Summary of th
 | [obra/superpowers](https://github.com/obra/superpowers) | planning, debugging and review skills | MIT |
 | [gsd-build/get-shit-done](https://github.com/gsd-build/get-shit-done) | workflow skills | MIT |
 | [blader/humanizer](https://github.com/blader/humanizer) | `creative-humanizer` | MIT |
-| [JimLiu/baoyu-skills](https://github.com/JimLiu/baoyu-skills) | `creative-baoyu-*` | MIT |
 | [heygen-com/hyperframes](https://github.com/heygen-com/hyperframes) | `creative-hyperframes` | see upstream |
 | Community contributors | integrations such as Notion, Airtable, Shopify, OpenHue | MIT |
 

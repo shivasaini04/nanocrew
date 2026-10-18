@@ -214,7 +214,6 @@ When the user describes a video, look for these signals to map to an example:
 - **"Explain how X works", math/algorithm/concept walkthrough** → Example 4 (manim explainer)
 - **Terminal aesthetic, ASCII, retro pixel** → Example 5 (ASCII)
 - **"Audio-reactive", "real-time", "installation"** → Example 6 (TouchDesigner)
-- **Comic-style narrative** → use `renderer-comic` (`baoyu-comic` skill)
 - **Retro game / pixel-art aesthetic** → use `renderer-pixel` (`pixel-art` skill)
 - **3D scene, photoreal environment** → use `renderer-3d` (`blender-mcp`)
 - **Generative art, particle system, shader** → use `renderer-p5js` (`p5js`)

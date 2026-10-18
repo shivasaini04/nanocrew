@@ -178,7 +178,7 @@ _PROFILES: dict[str, SourceProfile] = {
         crawl_delay_s=18.0,     # x_search._MIN_GAP_S
         jitter_s=14.0,          # x_search._JITTER_S
         per_cycle_budget=180,   # x_search._DAILY_CAP_MAX
-        notes="Blocked from the Contabo egress IP. Cadence must not be machine-regular.",
+        notes="Often blocked from datacenter IPs. Cadence must not be machine-regular.",
     ),
 }
 _PROFILES["twitter.com"] = _PROFILES["x.com"]

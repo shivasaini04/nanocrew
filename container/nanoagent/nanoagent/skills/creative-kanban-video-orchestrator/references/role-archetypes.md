@@ -60,7 +60,7 @@ local skills.
 - **Toolsets:** kanban, terminal, file
 - **Skills:** `kanban-worker` plus any project-specific design skill —
   `claude-design` (UI/web), `sketch` (quick mockup variants),
-  `popular-web-designs` (matching known web aesthetic), `pixel-art` (retro),
+  `pixel-art` (retro),
   `ascii-art` (terminal/retro), `excalidraw` (hand-drawn frames),
   `design-md` (text-based design docs)
 - **Outputs:** `visual-spec.md`, `taste/style-frames/*.png`
@@ -118,7 +118,6 @@ instead of overloading one. Each loads a different creative skill.
 | `renderer-touchdesigner` | `touchdesigner-mcp` | Real-time, audio-reactive, installation art, VJ-style content |
 | `renderer-3d` | `blender-mcp` *(optional)* | 3D modeling, animation, photoreal environments, character animation |
 | `renderer-pixel` | `pixel-art` | Retro game aesthetic with era-correct palettes |
-| `renderer-comic` | `baoyu-comic` | Knowledge-comic style narrative scenes |
 | `renderer-meme` | `meme-generation` *(optional)* | Meme-style stills for satirical/social content |
 | `renderer-procedural` | (none — Python with PIL + ffmpeg directly) | Custom procedural content where no skill fits |
 | `renderer-video` | (external image-to-video API: Runway / Kling / Luma) | Animating still images in narrative film |

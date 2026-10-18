@@ -9,7 +9,7 @@ platforms: [linux, macos]
 metadata:
   nanocrew:
     tags: [debugging, python, pdb, debugpy, breakpoints, dap, post-mortem]
-    related_skills: [systematic-debugging, node-inspect-debugger, debugging-hermes-tui-commands]
+    related_skills: [systematic-debugging, node-inspect-debugger]
 ---
 
 # Python Debugger (pdb + debugpy)
@@ -249,7 +249,7 @@ This is fine for one-off automation but painful as an interactive UX.
   "connect": { "host": "127.0.0.1", "port": 5678 },
   "justMyCode": false,
   "pathMappings": [
-    { "localRoot": "${workspaceFolder}", "remoteRoot": "/home/bb/nanocrew" }
+    { "localRoot": "${workspaceFolder}", "remoteRoot": "/path/to/project" }
   ]
 }
 ```

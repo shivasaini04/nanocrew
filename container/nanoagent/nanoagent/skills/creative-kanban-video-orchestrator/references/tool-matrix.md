@@ -19,8 +19,6 @@ called from the terminal toolset; they don't appear in `always_load`.
 | `touchdesigner-mcp` | Control a running TouchDesigner instance — real-time visuals, audio-reactive installation art, VJ | Renderer for real-time/audio-reactive content; installation art; live performance |
 | `blender-mcp` *(optional)* | Control Blender 4.3+ via MCP — 3D modeling, animation, rendering | Renderer for 3D scenes, photoreal environments, character animation |
 | `pixel-art` | Pixel art with era palettes (NES, Game Boy, PICO-8) | Renderer for retro game aesthetic; concept artist for pixel-style frames |
-| `baoyu-comic` | Knowledge-comic generation (educational, biography, tutorial) | Renderer for comic-style narrative; explainer in panel form |
-| `baoyu-infographic` | Infographic generation | Renderer for data-driven explainer scenes |
 | `meme-generation` *(optional)* | Generate meme images by overlaying text on templates | Generator for satirical/social content; meme-style stills |
 
 ### Design / pre-production skills (`hermes-agent/skills/creative/`)
@@ -29,7 +27,6 @@ called from the terminal toolset; they don't appear in `always_load`.
 |-------|--------------|--------------|
 | `claude-design` | Design one-off HTML artifacts (landing, deck, prototype) | Concept artist for product video style frames; storyboarder for UI-heavy content |
 | `design-md` | Design markdown docs | Concept artist documenting visual specs |
-| `popular-web-designs` | Reference patterns for popular web designs | Concept artist; cinematographer when matching a known UI aesthetic |
 | `sketch` | Throwaway HTML mockups (2-3 design variants to compare) | Concept artist exploring directions; storyboarder for UI flows |
 | `excalidraw` | Excalidraw-style hand-drawn diagrams | Storyboarder; concept artist for sketch-style frames |
 | `architecture-diagram` | Software architecture diagrams | Storyboarder for technical content; explainer scenes about systems |
@@ -139,7 +136,6 @@ skills:
     # - excalidraw          (hand-drawn frames)
     # - ascii-art           (ASCII style frames)
     # - pixel-art           (retro/game aesthetic)
-    # - popular-web-designs (matching known web aesthetic)
     # - design-md           (text-based design docs)
 ```
 
@@ -197,7 +193,6 @@ skills:
     # - touchdesigner-mcp         (renderer-touchdesigner)
     # - blender-mcp               (renderer-3d)
     # - pixel-art                 (renderer-pixel)
-    # - baoyu-comic               (renderer-comic)
     # - meme-generation           (renderer-meme)
 ```
 
