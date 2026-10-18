@@ -35,7 +35,9 @@ const CHROME_CANDIDATES = [
     '/usr/bin/chromium-browser',
 ];
 const chromePath = CHROME_CANDIDATES.find(p => existsSync(p));
-const describeWithChrome = chromePath ? describe : describe.skip;
+// Also skipped on CI: these tests load the live example.com, so they depend on the runner's network.
+// Set RUN_BROWSER_TESTS=1 to run them anyway.
+const describeWithChrome = chromePath && (!process.env.CI || process.env.RUN_BROWSER_TESTS) ? describe : describe.skip;
 
 let server: Server;
 let port: number;

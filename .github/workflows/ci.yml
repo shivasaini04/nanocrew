@@ -23,8 +23,11 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
 
+      - name: Dashboard dependencies
+        run: cd dashboard && npm ci
+
       - name: Tests
         run: npx vitest run
 
       - name: Dashboard build
-        run: cd dashboard && npm ci && npm run build
+        run: cd dashboard && npm run build
