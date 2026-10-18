@@ -980,12 +980,15 @@ agentsRouter.get('/conversations', (req, res) => {
   }
 });
 
-// ─── GET /api/agents/handoffs/recent — recent handoffs across all agents ──────
+// ─── GET /api/agents/handoffs/recent — recent handoffs across the caller's agents ──
 
 agentsRouter.get('/handoffs/recent', (_req, res) => {
   try {
     const limit = Number(_req.query.limit) || 20;
-    res.json(getRecentHandoffs(limit));
+    const mine = filterOwned(_req, agentService.getAllAgents()).map(
+      (a) => a.id,
+    );
+    res.json(getRecentHandoffs(mine, limit));
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

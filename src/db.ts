@@ -6033,10 +6033,20 @@ export function updateHandoffNote(id: string, note: string): void {
   db.prepare('UPDATE agent_handoffs SET note = ? WHERE id = ?').run(note, id);
 }
 
-export function getRecentHandoffs(limit = 20): AgentHandoff[] {
+/** Recent handoffs that touch any of `agentIds` (sender or recipient). Callers pass the
+ *  caller's own agents: an unscoped version of this query served every account's handoffs
+ *  to any signed-in user (found 2026-10-18 from a fresh test account). */
+export function getRecentHandoffs(
+  agentIds: string[],
+  limit = 20,
+): AgentHandoff[] {
+  if (agentIds.length === 0) return [];
+  const ph = agentIds.map(() => '?').join(',');
   return db
-    .prepare('SELECT * FROM agent_handoffs ORDER BY created_at DESC LIMIT ?')
-    .all(limit) as AgentHandoff[];
+    .prepare(
+      `SELECT * FROM agent_handoffs WHERE from_agent_id IN (${ph}) OR to_agent_id IN (${ph}) ORDER BY created_at DESC LIMIT ?`,
+    )
+    .all(...agentIds, ...agentIds, limit) as AgentHandoff[];
 }
 
 // ─── Agent Chat Messages ──────────────────────────────────────────────────────
