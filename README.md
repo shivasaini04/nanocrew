@@ -94,4 +94,5 @@ See [docs/getting-started.md](docs/getting-started.md) for details and troublesh
 ## License
 
 MIT. Copyright (c) 2026 AxonCrew, and Gavriel for the upstream NanoClaw project this began as a fork of. Third-party
-code and credits are listed in [THIRD_PARTY.md](THIRD_PARTY.md).
+code and credits are listed in [THIRD_PARTY.md](THIRD_PARTY.md). Note: the optional WhatsApp channel depends on a
+GPL-3.0 library (via Baileys); see the licensing table there.

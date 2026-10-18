@@ -41,3 +41,16 @@ Hugging Face). Those remain the property of their authors.
 
 Runtime dependencies are installed from npm and PyPI and keep their own licenses. See `package.json`,
 `dashboard/package.json` and `container/nanoagent/pyproject.toml`.
+
+### Dependencies with copyleft or unusual licenses
+
+Checked 18 Oct 2026 with `license-checker` (npm) and `pip-licenses` (Python). Everything else is MIT, Apache-2.0, BSD,
+ISC or similar.
+
+| Dependency | License | Note |
+|---|---|---|
+| `@whiskeysockets/libsignal-node` | GPL-3.0 | Pulled in by Baileys (MIT), which powers the optional WhatsApp channel. Not copied into this repo; npm installs it. If GPL-3.0 does not suit your use, do not enable WhatsApp, or remove the Baileys dependency. |
+| `sharp` (libvips binaries) | LGPL-3.0-or-later | Prebuilt image library, used as a normal dynamic dependency. |
+| `python-telegram-bot` | LGPL-3.0 | Used as a library by the Telegram channel. |
+| `lark-oapi` | not stated in package metadata | Used by the optional Feishu channel. Check upstream before relying on it. |
+| `pymupdf` | AGPL-3.0 (or commercial) | Not a dependency of NanoCrew. The optional `productivity-ocr-and-documents` skill imports it if you install it yourself. |

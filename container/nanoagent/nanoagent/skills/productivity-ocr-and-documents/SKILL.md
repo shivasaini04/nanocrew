@@ -12,6 +12,8 @@ metadata:
     related_skills: [powerpoint]
 ---
 
+> **License note:** `pymupdf` is AGPL-3.0 (or commercial). NanoCrew does not ship it; installing it for this skill is your choice.
+
 # PDF & Document Extraction
 
 For DOCX: use `python-docx` (parses actual document structure, far better than OCR).
