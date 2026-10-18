@@ -948,34 +948,6 @@ function createSchema(database: Database.Database): void {
       created_at    TEXT NOT NULL
     );
 
-    -- Stage 32 — Dodo Payments billing record (one row per Dodo subscription).
-    -- users.plan stays the entitlement flag; this is the billing truth.
-    CREATE TABLE IF NOT EXISTS subscriptions (
-      id                    TEXT PRIMARY KEY,          -- Dodo subscription_id
-      user_id               TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      status                TEXT NOT NULL,             -- active|on_hold|cancelled|failed|expired
-      plan                  TEXT NOT NULL,             -- resolved tier: standard|pro|business
-      dodo_customer_id      TEXT,
-      dodo_product_id       TEXT,
-      current_period_end    TEXT,                      -- next_billing_date (ISO)
-      previous_billing_date TEXT,
-      cancel_at_period_end  INTEGER NOT NULL DEFAULT 0,
-      created_at            TEXT NOT NULL,
-      updated_at            TEXT NOT NULL,
-      raw                   TEXT
-    );
-    CREATE INDEX IF NOT EXISTS idx_subscriptions_user ON subscriptions(user_id);
-
-    -- Stage 32 — webhook idempotency + audit. id = Standard Webhooks webhook-id header.
-    CREATE TABLE IF NOT EXISTS webhook_events (
-      id              TEXT PRIMARY KEY,
-      type            TEXT NOT NULL,
-      subscription_id TEXT,
-      received_at     TEXT NOT NULL,
-      status          TEXT,
-      payload         TEXT
-    );
-
     -- Stage 32 — one row per cycle-usage reminder fired (per user/month/threshold), so each
     -- 50/75/90/99/100% reminder fires at most once a month. Self-resets: new month = new rows.
     CREATE TABLE IF NOT EXISTS usage_alerts (
@@ -1026,13 +998,6 @@ function createSchema(database: Database.Database): void {
   }
   try {
     database.exec(`ALTER TABLE users ADD COLUMN byok_model TEXT`);
-  } catch {
-    /* already present */
-  }
-
-  // Stage 32 — Dodo customer id for reverse customer→user webhook lookup.
-  try {
-    database.exec(`ALTER TABLE users ADD COLUMN dodo_customer_id TEXT`);
   } catch {
     /* already present */
   }
@@ -2517,122 +2482,6 @@ export function countUserProjects(userId: string): number {
     .prepare('SELECT COUNT(*) n FROM projects WHERE owner_id = ?')
     .get(userId) as { n: number };
   return r?.n ?? 0;
-}
-
-// ── Stage 32 — Dodo Payments subscriptions & webhook idempotency ──────────────
-export interface SubscriptionRow {
-  id: string;
-  user_id: string;
-  status: string;
-  plan: string;
-  dodo_customer_id: string | null;
-  dodo_product_id: string | null;
-  current_period_end: string | null;
-  previous_billing_date: string | null;
-  cancel_at_period_end: number;
-  created_at: string;
-  updated_at: string;
-  raw: string | null;
-}
-
-/** Insert or update a subscription row (keyed on Dodo subscription_id). */
-export function upsertSubscription(s: {
-  id: string;
-  user_id: string;
-  status: string;
-  plan: string;
-  dodo_customer_id?: string | null;
-  dodo_product_id?: string | null;
-  current_period_end?: string | null;
-  previous_billing_date?: string | null;
-  cancel_at_period_end?: boolean;
-  raw?: string | null;
-}): void {
-  const now = new Date().toISOString();
-  db.prepare(
-    `INSERT INTO subscriptions
-       (id, user_id, status, plan, dodo_customer_id, dodo_product_id,
-        current_period_end, previous_billing_date, cancel_at_period_end, created_at, updated_at, raw)
-     VALUES (@id, @user_id, @status, @plan, @dodo_customer_id, @dodo_product_id,
-             @current_period_end, @previous_billing_date, @cancel_at_period_end, @now, @now, @raw)
-     ON CONFLICT(id) DO UPDATE SET
-       status=@status, plan=@plan, dodo_customer_id=@dodo_customer_id, dodo_product_id=@dodo_product_id,
-       current_period_end=@current_period_end, previous_billing_date=@previous_billing_date,
-       cancel_at_period_end=@cancel_at_period_end, updated_at=@now, raw=@raw`,
-  ).run({
-    id: s.id,
-    user_id: s.user_id,
-    status: s.status,
-    plan: s.plan,
-    dodo_customer_id: s.dodo_customer_id ?? null,
-    dodo_product_id: s.dodo_product_id ?? null,
-    current_period_end: s.current_period_end ?? null,
-    previous_billing_date: s.previous_billing_date ?? null,
-    cancel_at_period_end: s.cancel_at_period_end ? 1 : 0,
-    now,
-    raw: s.raw ?? null,
-  });
-}
-
-/** Latest subscription for a user (most recently updated). */
-export function getSubscriptionByUser(
-  userId: string,
-): SubscriptionRow | undefined {
-  return db
-    .prepare(
-      'SELECT * FROM subscriptions WHERE user_id = ? ORDER BY updated_at DESC LIMIT 1',
-    )
-    .get(userId) as SubscriptionRow | undefined;
-}
-
-/** Tier of the user's entitling subscription: status 'active', or 'cancelled' but not yet
- *  past its period end (end-of-cycle access). Returns null if the user has no such subscription. */
-export function getActiveSubscriptionPlan(userId: string): string | null {
-  const row = db
-    .prepare(
-      `SELECT plan FROM subscriptions
-     WHERE user_id = ? AND (status = 'active' OR (status = 'cancelled' AND current_period_end > ?))
-     ORDER BY updated_at DESC LIMIT 1`,
-    )
-    .get(userId, new Date().toISOString()) as { plan?: string } | undefined;
-  return row?.plan ?? null;
-}
-
-export function setUserDodoCustomer(userId: string, customerId: string): void {
-  db.prepare('UPDATE users SET dodo_customer_id = ? WHERE id = ?').run(
-    customerId,
-    userId,
-  );
-}
-export function getUserByDodoCustomer(customerId: string): User | undefined {
-  return db
-    .prepare('SELECT * FROM users WHERE dodo_customer_id = ?')
-    .get(customerId) as User | undefined;
-}
-
-/** Record a webhook event for idempotency. Returns false if this webhook-id was already seen. */
-export function recordWebhookEvent(
-  id: string,
-  type: string,
-  subscriptionId: string | null,
-  payload: string,
-): boolean {
-  const r = db
-    .prepare(
-      `INSERT OR IGNORE INTO webhook_events (id, type, subscription_id, received_at, status, payload)
-     VALUES (?, ?, ?, ?, 'received', ?)`,
-    )
-    .run(id, type, subscriptionId, new Date().toISOString(), payload);
-  return r.changes > 0;
-}
-export function markWebhookEvent(
-  id: string,
-  status: 'processed' | 'error',
-): void {
-  db.prepare('UPDATE webhook_events SET status = ? WHERE id = ?').run(
-    status,
-    id,
-  );
 }
 
 /** Record a cycle-usage reminder for a user/month/threshold. Returns true if newly recorded

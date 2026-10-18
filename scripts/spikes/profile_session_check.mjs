@@ -1,7 +1,7 @@
 /**
  * Is a browser profile ACTUALLY signed into a site?
  *
- * Extracted from cdp_spike.mjs (stage 52 step 1) because it is the one piece of that
+ * Extracted from an earlier spike because it is the one piece of that
  * throwaway spike worth keeping. Not yet wired into anything — this is the seed of the
  * companion's "is this site connected?" check, kept runnable so the next person does not
  * have to rediscover it.

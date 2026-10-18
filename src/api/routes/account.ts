@@ -81,7 +81,6 @@ accountRouter.get('/account', (req: Request, res: Response) => {
     byok: { provider: byok.provider, hasKey: !!byok.keyEnc, model: byok.model },
     byokProviders: Object.keys(BYOK_PROVIDER_ENV),
     byokAllowed: planAllowsByok(full.plan), // Pro/Business only — gate the UI to match the server
-    hasBilling: !!full.dodo_customer_id, // has a Dodo customer → can open the billing portal
     defaultModel: getUserDefaultModel(full.id), // this owner's default for agents without their own override
   });
 });

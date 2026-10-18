@@ -52,12 +52,10 @@ export interface User {
   status: 'active' | 'suspended';
   created_at: string;
   last_active: string | null;
-  /** Entitlement tier: 'standard' | 'pro' | 'business' (Stage 32). Set by Dodo webhook or admin. */
+  /** Entitlement tier: 'standard' | 'pro' | 'business' (Stage 32). Set by admin. */
   plan?: string | null;
   /** ISO timestamp of when the user finished first-run onboarding. null = not yet onboarded. */
   onboarded_at?: string | null;
-  /** Dodo Payments customer id, for reverse customer→user webhook lookup (Stage 32). */
-  dodo_customer_id?: string | null;
 }
 
 /** Stage 28 auth — a server-side login session (opaque cookie id → user). */

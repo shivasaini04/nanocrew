@@ -32,10 +32,8 @@
     "cors": "^2.8.6",
     "cron-parser": "^5.5.0",
     "express": "^5.2.1",
-    "imapflow": "^1.6.6",
     "jimp": "^1.6.1",
     "link-preview-js": "^3.0.0",
-    "mailparser": "^3.9.15",
     "multer": "^2.1.1",
     "nodemailer": "^9.0.1",
     "pino": "^9.6.0",
@@ -50,12 +48,10 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
     "@types/better-sqlite3": "^7.6.12",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "@types/mailparser": "^3.4.6",
     "@types/multer": "^2.1.0",
     "@types/node": "^22.10.0",
     "@types/nodemailer": "^8.0.1",

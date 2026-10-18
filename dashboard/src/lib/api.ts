@@ -226,7 +226,6 @@ export interface AccountInfo {
     byok: { provider: string | null; hasKey: boolean; model: string | null }
     byokProviders: string[]
     byokAllowed: boolean
-    hasBilling: boolean
     defaultModel: string | null
 }
 export const getAccount = () => fetchApi<AccountInfo>('/account');
