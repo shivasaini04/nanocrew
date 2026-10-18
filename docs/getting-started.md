@@ -71,3 +71,5 @@ Some tests need a real Chrome or git, or behave differently on Windows. Failures
 - **Agents answer with a model error**: check the provider key in `.env` and `docker logs nanocrew-litellm`.
 - **Container changes have no effect**: warm `NanoCrew-daemon-*` containers survive an image rebuild. Remove them
   with `docker rm -f $(docker ps -aq --filter name=NanoCrew-daemon)`.
+- **`npm install` fails building `better-sqlite3` on Windows** (`link.exe` / path errors): clone into a short path such as `C:
+c` (long folder paths break the native build), and use Node 20 or 22 LTS if no prebuilt binary exists for your Node version.
