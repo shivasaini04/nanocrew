@@ -1,0 +1,75 @@
+name: Docker quickstart
+
+# Follows the README quickstart on a clean Linux runner: build the agent image, build the
+# orchestrator, `docker compose up`, then check the app answers. Slow (builds a browser
+# image), so it runs on pushes that touch the container setup, and on demand.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'container/**'
+      - 'Dockerfile.orchestrator'
+      - 'docker-compose.yml'
+      - 'litellm_config.yaml'
+      - '.env.example'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/docker.yml'
+
+jobs:
+  quickstart:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          df -h /
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Build the agent image
+        run: bash container/build.sh
+
+      - name: Agent image can import its own code
+        run: docker run --rm --entrypoint python nanocrew-agent:latest -c "import nanoagent; print('nanoagent import ok')"
+
+      - name: Build the orchestrator
+        run: npm ci && npm run build
+
+      - name: Configure .env (one dummy key, as a new user would add a real one)
+        run: |
+          cp .env.example .env
+          sed -i "s|^ANTHROPIC_API_KEY=.*|ANTHROPIC_API_KEY=sk-ant-dummy-for-ci|" .env
+          sed -i "s|^HOST_PROJECT_ROOT=.*|HOST_PROJECT_ROOT=$GITHUB_WORKSPACE|" .env
+          sed -i "s|^SESSION_SECRET=.*|SESSION_SECRET=$(openssl rand -hex 32)|" .env
+          sed -i "s|^SESSION_ENCRYPTION_KEY=.*|SESSION_ENCRYPTION_KEY=$(openssl rand -hex 32)|" .env
+          sed -i "s|^ADMIN_PASSWORD=.*|ADMIN_PASSWORD=ci-admin-password-1234|" .env
+
+      - name: docker compose up
+        run: docker compose up -d --build
+
+      - name: Wait for the app to answer
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:3002/health >/dev/null; then echo "orchestrator healthy after ${i}x5s"; exit 0; fi
+            sleep 5
+          done
+          echo "orchestrator did not become healthy"; exit 1
+
+      - name: Dashboard is served
+        run: curl -fsS http://localhost:3002/ | grep -qi "<div id=\"root\"\|<html"
+
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs --no-color --tail 200
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v
