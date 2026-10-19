@@ -17,7 +17,7 @@
  *   conflict_count — number of files with unresolved conflict markers
  *   summary        — human-readable summary for PR body
  *
- * Usage: npx tsx scripts/fix-skill-drift.ts add-telegram add-discord
+ * Usage: npx tsx scripts/fix-skill-drift.ts <skill-a> <skill-b>
  */
 import { execFileSync, execSync } from 'child_process';
 import crypto from 'crypto';

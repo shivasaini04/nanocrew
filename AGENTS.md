@@ -14,7 +14,7 @@ LiteLLM gateway sits in front of the model providers. See [docs/architecture.md]
 | `container/nanoagent/` | The Python agent runtime: `agent/` (loop, tools, memory, browser "effector"), `providers/`, `channels/`, `skills/` (built-in skills), `tests/` |
 | `container/agent-runner/` | Container-side runner for group-chat agents; `src/container-runner.ts` talks to it |
 | `skills-engine/` | Applies and updates skills that change the orchestrator source |
-| `.claude/skills/` | Claude Code skills for maintainers (`setup`, `debug`, `update`, `customize`) and `add-*` channel templates (Discord, Slack, Telegram, Gmail...) applied through `skills-engine`. **The `add-*` templates are currently stale against `src/` and do not typecheck once applied**; treat them as unmaintained until they are refreshed. Separate from the agents' own skills in `container/nanoagent/nanoagent/skills/` |
+| `.claude/skills/` | Claude Code skills for maintainers (`setup`, `debug`, `update`, `customize`) and a few other skills (`x-integration`, `add-parallel`, `get-qodo-rules`, `qodo-pr-resolver`) that `skills-engine` can apply. The old Discord/Slack/Telegram/Gmail/voice/Apple-container templates were removed on 19 Oct 2026 because they no longer matched `src/`. Separate from the agents' own skills in `container/nanoagent/nanoagent/skills/` |
 | `setup/` | The `npm run setup` helper |
 | `companion/`, `extension/` | Local browser companion and Chrome extension |
 | `docs/` | User docs. `groups/*/CLAUDE.md` are the agents' own instructions, not contributor notes |

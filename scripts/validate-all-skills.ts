@@ -11,14 +11,14 @@
  *
  * Sets GitHub Actions outputs:
  *   drifted       — "true" | "false"
- *   drifted_skills — JSON array of drifted skill names, e.g. ["add-telegram"]
+ *   drifted_skills — JSON array of drifted skill names, e.g. ["skill-a"]
  *   results        — JSON array of per-skill results
  *
  * Exit code 1 if any skill drifted, 0 otherwise.
  *
  * Usage:
  *   npx tsx scripts/validate-all-skills.ts              # validate all
- *   npx tsx scripts/validate-all-skills.ts add-telegram  # validate one
+ *   npx tsx scripts/validate-all-skills.ts <skill-name>  # validate one
  */
 import { execSync } from 'child_process';
 import fs from 'fs';
