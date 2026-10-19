@@ -12,9 +12,9 @@ LiteLLM gateway sits in front of the model providers. See [docs/architecture.md]
 | `dashboard/` | React + Vite SPA, its own `package.json`. Built into the orchestrator image; `dashboard/dist` is never committed |
 | `container/Dockerfile` | The agent sandbox image (built by `container/build.sh`) |
 | `container/nanoagent/` | The Python agent runtime: `agent/` (loop, tools, memory, browser "effector"), `providers/`, `channels/`, `skills/` (built-in skills), `tests/` |
-| `container/agent-runner/` | Small Node runner used inside group-chat containers |
+| `container/agent-runner/` | Container-side runner for group-chat agents; `src/container-runner.ts` talks to it |
 | `skills-engine/` | Applies and updates skills that change the orchestrator source |
-| `.claude/skills/` | Install-time skill templates (Discord, Slack, Telegram, Gmail...). Not loaded by the agents |
+| `.claude/skills/` | Claude Code skills for maintainers (`setup`, `debug`, `update`, `customize`) and `add-*` channel templates (Discord, Slack, Telegram, Gmail...) applied through `skills-engine`. Separate from the agents' own skills in `container/nanoagent/nanoagent/skills/` |
 | `setup/` | The `npm run setup` helper |
 | `companion/`, `extension/` | Local browser companion and Chrome extension |
 | `docs/` | User docs. `groups/*/CLAUDE.md` are the agents' own instructions, not contributor notes |
