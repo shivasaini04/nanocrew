@@ -5,13 +5,9 @@ name: Skill Drift Detection
 # If a skill drifts, attempts auto-fix via three-way merge of modify/ files,
 # then opens a PR with the result (auto-fixed or with conflict markers).
 
+# Manual only for now: the channel skills' modify/ templates are stale against the current source
+# (`scripts/validate-all-skills.ts` fails all six on typecheck), so a push trigger would open an auto-fix PR full of conflicts every time.
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'src/**'
-      - 'container/**'
-      - 'package.json'
   workflow_dispatch:
 
 permissions:
