@@ -19,7 +19,7 @@ its workspace is unaffected and nothing here can be committed by accident.
 
 Git rather than file copies because a workspace is mostly unchanged between turns:
 git stores one blob per distinct content and the snapshot costs almost nothing. It
-is also already in the image (``container/nanoagent/Dockerfile``) for ``git_tool``.
+is also already in the image (``container/Dockerfile``) for ``git_tool``.
 
 Snapshots are taken **once per turn, before the first mutating tool runs** — the
 same trigger Hermes uses. Taking one per mutation would multiply the cost for no
