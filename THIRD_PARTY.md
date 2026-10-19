@@ -52,5 +52,5 @@ ISC or similar.
 | `@whiskeysockets/libsignal-node` | GPL-3.0 | Pulled in by Baileys (MIT), which powers the optional WhatsApp channel. Not copied into this repo; npm installs it. If GPL-3.0 does not suit your use, do not enable WhatsApp, or remove the Baileys dependency. |
 | `sharp` (libvips binaries) | LGPL-3.0-or-later | Prebuilt image library, used as a normal dynamic dependency. |
 | `python-telegram-bot` | LGPL-3.0 | Used as a library by the Telegram channel. |
-| `lark-oapi` | not stated in package metadata | Used by the optional Feishu channel. Check upstream before relying on it. |
+| `lark-oapi` | MIT (licence file in the wheel; package metadata leaves the field blank) | Used by the optional Feishu channel. |
 | `pymupdf` | AGPL-3.0 (or commercial) | Not a dependency of NanoCrew. The optional `productivity-ocr-and-documents` skill imports it if you install it yourself. |
