@@ -46,7 +46,9 @@ services:
   # Model gateway. Every Python and Node caller routes through it when LITELLM_PROXY_URL is set:
   # provider keys stay out of agent containers, with fallback on 429/quota.
   litellm:
-    image: ghcr.io/berriai/litellm:main-stable
+    # Pinned: the moving `main-stable` tag was withdrawn upstream (`manifest unknown`), which
+    # broke a fresh `docker compose up`. Bump deliberately and re-run the Docker quickstart CI.
+    image: ghcr.io/berriai/litellm:v1.106.1
     container_name: nanocrew-litellm
     restart: unless-stopped
     ports:
