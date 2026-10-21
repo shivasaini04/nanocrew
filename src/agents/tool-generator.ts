@@ -95,7 +95,7 @@ async function callGemini(
   maxTokens: number,
 ): Promise<string> {
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -151,7 +151,7 @@ export async function callLLM(
         ? callOpenAICompat(
             'https://api.groq.com/openai/v1/chat/completions',
             keys.groq,
-            'llama-3.3-70b-versatile',
+            'openai/gpt-oss-120b',
             systemPrompt,
             userPrompt,
             maxTokens,

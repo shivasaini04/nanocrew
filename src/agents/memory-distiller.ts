@@ -122,7 +122,7 @@ function getDistillerModel(agentId?: string) {
   }
   if (groqKey) {
     const groq = createGroq({ apiKey: groqKey });
-    return groq('llama-3.3-70b-versatile');
+    return groq('openai/gpt-oss-120b');
   }
   throw new Error(
     'No LLM provider available for memory distillation. Set DEEPSEEK_API_KEY, MOONSHOT_KIMI_API_KEY, ANTHROPIC_API_KEY, or GROQ_API_KEY.',

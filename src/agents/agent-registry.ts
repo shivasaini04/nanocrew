@@ -35,7 +35,7 @@ import {
   type NotificationSink,
 } from './notification-sink.js';
 import { getSocketIO } from '../api/instances.js';
-import { getAgentCycleById } from '../db.js';
+import { getAgentCycleById, getAgentInterruptFlag } from '../db.js';
 import { logger } from '../logger.js';
 import { canWake } from './wake-policy.js';
 import type { CycleType } from '../types.js';
@@ -79,6 +79,15 @@ export async function resumeCycle(
       logger.info(
         { agentId },
         'SelfHealing: retryCycle skipped — wake policy has recovery turned off (or agent is stopped)',
+      );
+      return;
+    }
+    // Stop sets this flag, but the retried cycle clears it on start, so without this check
+    // a failure that lands after Stop quietly starts the agent again (seen live 2026-10-21).
+    if (getAgentInterruptFlag(agentId)) {
+      logger.info(
+        { agentId },
+        'SelfHealing: retryCycle skipped — the agent was stopped',
       );
       return;
     }

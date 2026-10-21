@@ -42,11 +42,11 @@ export const DEFAULT_MODEL_CONFIG: ModelConfig = {
     // Has a real consumer (nanocrew_adapter.py reads NANOBOT_MEMORY_MODEL for
     // memory consolidation) — routed to the cheapest OpenRouter model.
     memory_distill: 'openrouter/inclusionai/ling-3.0-flash',
-    classification: 'groq/llama-3.3-70b-versatile',
+    classification: 'groq/openai/gpt-oss-120b',
     // Has a real consumer (loop.py reads VISION_MODEL) — MiMo-V2.5 is natively
     // omnimodal (text/image/audio/video) and cheaper than the prior Kimi vision model.
     vision: 'openrouter/xiaomi/mimo-v2.5',
-    computer_use: 'gemini/gemini-2.0-flash',
+    computer_use: 'gemini/gemini-3.5-flash',
     // These three used to be hardcoded 'deepseek/deepseek-v4-flash' literals in
     // agent-service.ts / identity-evolution.ts / agents.ts / tool-generator.ts,
     // bypassing this router entirely — changing Settings -> Models did nothing for

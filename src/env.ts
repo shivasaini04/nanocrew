@@ -50,8 +50,8 @@ export const MANAGED_KEYS = [
   'DASHBOARD_PORT',
   // Platform-wide policy (non-secret)
   'GLOBAL_DAILY_BUDGET_USD', // empty = no cap. Number = USD cap across all agents per day.
-  'MODEL_PRIORITY', // comma-separated fallback chain, e.g. "deepseek/deepseek-chat,gemini/gemini-2.0-flash"
-  'LIGHT_MODEL', // cheap/fast model for conversational replies, e.g. "groq/llama-3.3-70b-versatile"
+  'MODEL_PRIORITY', // comma-separated fallback chain, e.g. "deepseek/deepseek-chat,gemini/gemini-3.5-flash"
+  'LIGHT_MODEL', // cheap/fast model for conversational replies, e.g. "groq/openai/gpt-oss-120b"
 ];
 
 /**

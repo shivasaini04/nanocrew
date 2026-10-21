@@ -52,12 +52,12 @@ export const DEFAULT_CPU_LIMIT_WORKER =
   '1';
 
 // Model routing: comma-separated provider/model fallback chain for heavy work.
-// e.g. "deepseek/deepseek-chat,gemini/gemini-2.0-flash"
+// e.g. "deepseek/deepseek-chat,gemini/gemini-3.5-flash"
 export const MODEL_PRIORITY =
   process.env.MODEL_PRIORITY || envConfig.MODEL_PRIORITY || '';
 
 // Cheap/fast model for conversational (light) replies.
-// e.g. "groq/llama-3.3-70b-versatile" or "deepseek/deepseek-v4-flash"
+// e.g. "groq/openai/gpt-oss-120b" or "deepseek/deepseek-v4-flash"
 export const LIGHT_MODEL =
   process.env.LIGHT_MODEL || envConfig.LIGHT_MODEL || '';
 
@@ -166,7 +166,7 @@ export const BYOK_DEFAULT_MODEL: Record<string, string> = {
   openai: 'openai/gpt-4o',
   gemini: 'gemini/gemini-2.5-pro',
   deepseek: 'deepseek/deepseek-chat',
-  groq: 'groq/llama-3.3-70b-versatile',
+  groq: 'groq/openai/gpt-oss-120b',
   openrouter: 'openrouter/auto',
 };
 

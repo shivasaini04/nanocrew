@@ -148,6 +148,9 @@ const MODEL_PRICING: Record<string, ModelRates> = {
   'moonshot/kimi-k2.5': {
     current: { cacheMiss: 1.6 / M, cacheHit: 1.6 / M, output: 1.6 / M },
   }, // no cache discount
+  'groq/openai/gpt-oss-120b': {
+    current: { cacheMiss: 0.15 / M, cacheHit: 0.075 / M, output: 0.6 / M },
+  },
   'groq/llama-3.3-70b-versatile': {
     current: { cacheMiss: 0.59 / M, cacheHit: 0.59 / M, output: 0.79 / M },
   }, // no cache discount

@@ -21,6 +21,7 @@ export type PolicyCondition =
   | { kind: 'or'; conditions: PolicyCondition[] }
   | { kind: 'not'; condition: PolicyCondition }
   | { kind: 'always' }
+  | { kind: 'event_is'; type: LaneEvent['type'] }
   | { kind: 'lane_red'; lane?: string }
   | { kind: 'lane_green'; lane?: string }
   | { kind: 'lane_blocked'; lane?: string }
@@ -138,6 +139,9 @@ export class PolicyEngine {
     switch (cond.kind) {
       case 'always':
         return true;
+
+      case 'event_is':
+        return ctx.event.type === cond.type;
 
       case 'and':
         return cond.conditions.every((c) => this._evalCondition(c, ctx));
@@ -285,7 +289,9 @@ export const DEFAULT_RULES: PolicyRule[] = [
     name: 'alert-stale-branch',
     priority: 8,
     enabled: true,
-    when: { kind: 'always' }, // evaluated only when BranchStaleAgainstMain fires (see wiring)
+    // Must name its event: `always` matched every lane event, so this priority-8 rule fired
+    // on each failed cycle and pre-empted 'escalate-after-three-consecutive-failures'.
+    when: { kind: 'event_is', type: 'BranchStaleAgainstMain' },
     then: {
       kind: 'notify',
       channel: 'dashboard',

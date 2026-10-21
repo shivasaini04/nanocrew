@@ -18,6 +18,7 @@ const PRICING: Record<string, { prompt: number; completion: number }> = {
     'gemini/gemini-2.0-flash': { prompt: 0.10, completion: 0.40 },
     'moonshot/kimi-k2.5': { prompt: 0.15, completion: 0.60 },
     'groq/llama-3.3-70b-versatile': { prompt: 0.59, completion: 0.79 },
+    'groq/openai/gpt-oss-120b': { prompt: 0.15, completion: 0.60 },
     'openrouter/inclusionai/ling-3.0-flash':             { prompt: 0.021, completion: 0.063 },
     'openrouter/deepseek/deepseek-v4-flash-0731':        { prompt: 0.14,  completion: 0.28  },
     'openrouter/tencent/hy3':                            { prompt: 0.126, completion: 0.522 },

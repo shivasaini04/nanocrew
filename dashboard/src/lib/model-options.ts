@@ -5,10 +5,10 @@
 export const MODEL_OPTIONS = [
     { value: 'deepseek/deepseek-v4-pro',       label: 'DeepSeek V4 Pro',       price: '$0.27/M in · $1.10/M out' },
     { value: 'deepseek/deepseek-v4-flash',      label: 'DeepSeek V4 Flash',     price: '$0.14/M in · $0.28/M out' },
-    { value: 'gemini/gemini-2.0-flash',         label: 'Gemini 2.0 Flash',      price: '$0.30/M in · $2.50/M out' },
+    { value: 'gemini/gemini-3.5-flash',         label: 'Gemini 3.5 Flash',      price: 'see Google pricing' },
     { value: 'moonshot/kimi-k2.5',              label: 'Moonshot Kimi K2.5',    price: '$1.60/M in · $1.60/M out' },
     { value: 'moonshot/moonshot-v1-8k-vision-preview', label: 'Kimi Vision Preview', price: '$1.20/M in · $1.20/M out' },
-    { value: 'groq/llama-3.3-70b-versatile',    label: 'Groq Llama 3.3 70B',   price: '$0.59/M in · $0.79/M out' },
+    { value: 'groq/openai/gpt-oss-120b',        label: 'Groq GPT-OSS 120B',    price: '$0.15/M in · $0.60/M out' },
     { value: 'openrouter/inclusionai/ling-3.0-flash',              label: 'OpenRouter: Ling-3.0 Flash',    price: '$0.021/M in · $0.063/M out' },
     { value: 'openrouter/deepseek/deepseek-v4-flash-0731',         label: 'OpenRouter: DeepSeek V4 Flash', price: '$0.14/M in · $0.28/M out' },
     { value: 'openrouter/tencent/hy3',                             label: 'OpenRouter: Tencent Hy3',       price: '$0.126/M in · $0.522/M out' },

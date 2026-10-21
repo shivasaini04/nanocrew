@@ -107,7 +107,7 @@ function getVisionModel() {
       apiKey: geminiKey,
       baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
     });
-    return gemini.chat('gemini-2.0-flash');
+    return gemini.chat('gemini-3.5-flash');
   }
   if (moonshotKey) {
     const ms = createOpenAI({

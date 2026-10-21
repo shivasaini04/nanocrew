@@ -503,7 +503,7 @@ async function streamAgentChat(
     return streamOpenAIProvider(
       'https://api.groq.com/openai/v1/chat/completions',
       keys.groq,
-      'llama-3.3-70b-versatile',
+      'openai/gpt-oss-120b',
       withSystem,
       maxTokens,
       onChunk,
