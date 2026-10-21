@@ -40,6 +40,10 @@ jobs:
       - name: Agent image can import its own code
         run: docker run --rm --entrypoint python nanocrew-agent:latest -c "import nanoagent; print('nanoagent import ok')"
 
+      - name: Agent image can make an LLM call (local stand-in, no key)
+        # --user 0:0 as the orchestrator starts agent containers (Docker-out-of-Docker).
+        run: docker run --rm --user 0:0 -v "$PWD/container/llm-smoke.py:/smoke.py:ro" --entrypoint python nanocrew-agent:latest /smoke.py
+
       - name: Build the orchestrator
         run: npm ci && npm run build
 

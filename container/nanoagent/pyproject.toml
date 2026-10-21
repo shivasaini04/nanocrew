@@ -18,7 +18,10 @@ classifiers = [
 
 dependencies = [
     "typer>=0.20.0,<1.0.0",
-    "litellm>=1.81.5,<2.0.0",
+    # litellm 1.103+ is built against mcp 2.x (imports mcp.types.CacheableResult), but we
+    # stay on mcp 1.x below, so with a newer litellm every LLM call dies with "cannot
+    # import name 'CacheableResult'". Raise both together.
+    "litellm>=1.81.5,<1.103.0",
     # litellm imports orjson unguarded on some provider paths (DeepSeek/Groq) but does
     # NOT declare it as a dependency, so a fresh image resolves without it and every
     # LLM call dies with "No module named 'orjson'". Pin it explicitly.
