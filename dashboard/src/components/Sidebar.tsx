@@ -749,7 +749,7 @@ export default function Sidebar({ isMobile = false, mobileOpen = false, onNaviga
                     width: '100%',
                     left: 20
                 }}>
-                    <span style={{ fontFamily: 'var(--cr-font-mono)', fontSize: '9px', color: 'var(--cr-muted)' }}>v0.4.1</span>
+                    <span style={{ fontFamily: 'var(--cr-font-mono)', fontSize: '9px', color: 'var(--cr-muted)' }}>v0.1.0</span>
                 </div>
             </div>
         </aside>

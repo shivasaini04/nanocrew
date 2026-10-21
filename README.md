@@ -6,7 +6,13 @@ web dashboard.
 
 > **Status:** v0.1, early. It runs, but expect rough edges and breaking changes. See [Roadmap](#roadmap).
 
-<!-- TODO: screenshot or demo GIF of the dashboard goes here -->
+<p align="center">
+  <img src="docs/images/dashboard-command-center.png" alt="The NanoCrew command center: your crew of agents, their status, spend and recent work" width="900">
+</p>
+
+<p align="center">
+  <img src="docs/images/agent-chat.png" alt="An agent running a task: shell command, file write and file read steps, then the result" width="900">
+</p>
 
 ## What it does
 
