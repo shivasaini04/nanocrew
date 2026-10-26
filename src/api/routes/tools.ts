@@ -6,6 +6,7 @@
 
 import { Router, Request, Response } from 'express';
 import { ToolLifecycleManager } from '../../services/tool-lifecycle-manager.js';
+import { requireAdmin } from '../middleware/auth.js';
 
 let lifecycleManager: ToolLifecycleManager | null = null;
 
@@ -22,6 +23,8 @@ function getManager(res: Response): ToolLifecycleManager | null {
 }
 
 const router = Router();
+// This legacy registry is platform-wide and has no per-owner records.
+router.use(requireAdmin);
 
 // GET /api/tools — list all tools across all jobs
 router.get('/', (_req: Request, res: Response) => {

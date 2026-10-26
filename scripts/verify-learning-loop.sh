@@ -36,7 +36,8 @@ set -uo pipefail
 
 IMAGE="${AGENT_IMAGE:-nanocrew-agent:latest}"
 ORCH="${ORCH_CONTAINER:-nanocrew-orchestrator}"
-ENV_FILE="${ENV_FILE:-/opt/nanocrew/nanocrew-main/.env}"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ENV_FILE="${ENV_FILE:-$PROJECT_ROOT/.env}"
 NETWORK="${DOCKER_NETWORK:-nanocrew_default}"
 LITELLM="${LITELLM_URL:-http://nanocrew-litellm:4000}"
 MODEL="${VERIFY_MODEL:-deepseek/deepseek-v4-flash}"

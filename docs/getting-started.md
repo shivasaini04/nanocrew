@@ -5,11 +5,14 @@
 - Docker with Compose v2
 - Node.js 20 or newer
 - At least one LLM API key (Anthropic, OpenRouter, DeepSeek, Gemini, Groq or Moonshot)
-- About 4 GB of free disk for the images
+- Bash (Git Bash or WSL on Windows)
+- At least 20 GB of free disk for the initial image build (the agent image has measured about 13 GB)
 
 ## Install with Docker
 
 ```bash
+git clone https://github.com/shivasaini04/nanocrew.git
+cd nanocrew
 cp .env.example .env
 ```
 
@@ -18,9 +21,10 @@ In `.env`, set:
 | Variable | Why |
 |---|---|
 | one provider key, e.g. `ANTHROPIC_API_KEY` | the agents need a model |
+| `MODEL_PRIORITY` | choose a model for that provider; default `claude-sonnet-4-6` needs an Anthropic key; OpenRouter example: `openrouter/anthropic/claude-sonnet-4.6` |
 | `HOST_PROJECT_ROOT` | absolute path of this checkout; the orchestrator passes it to the agent containers it starts |
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | the first admin account, created on first boot |
-| `SESSION_SECRET`, `SESSION_ENCRYPTION_KEY`, `nanocrew_SECRET_KEY` | generate each with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
+| `SESSION_SECRET`, `SESSION_ENCRYPTION_KEY`, `nanocrew_SECRET_KEY`, `LITELLM_PROXY_KEY` | generate each separately with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
 
 Build and start:
 

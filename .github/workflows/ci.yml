@@ -23,11 +23,29 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
 
+      - name: Orchestrator build
+        run: npm run build
+
       - name: Dashboard dependencies
         run: cd dashboard && npm ci
+
+      - name: Production dependency audit
+        run: |
+          npm audit --omit=dev --audit-level=high
+          cd dashboard && npm audit --omit=dev --audit-level=high
 
       - name: Tests
         run: npx vitest run
 
       - name: Dashboard build
         run: cd dashboard && npm run build
+
+      - name: Optional channel components
+        run: |
+          npm ci --prefix container/agent-runner
+          npm run build --prefix container/agent-runner
+          npm audit --prefix container/agent-runner --omit=dev --audit-level=high
+          npm ci --prefix container/nanoagent/bridge
+          npm run build --prefix container/nanoagent/bridge
+          npm audit --prefix container/nanoagent/bridge --omit=dev --audit-level=high
+          npm audit --prefix companion --omit=dev --audit-level=high

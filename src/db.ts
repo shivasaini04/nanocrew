@@ -6761,15 +6761,18 @@ export function getMatchingPipelines(
   const rows = db
     .prepare(
       `
-    SELECT * FROM pipelines
-    WHERE enabled = 1
-      AND trigger_status = ?
-      AND (source_agent_id IS NULL OR source_agent_id = ?)
-      AND (trigger_cycle_type IS NULL OR trigger_cycle_type = ?)
-      AND (project_id IS NULL OR project_id = ?)
+    SELECT p.* FROM pipelines p
+    WHERE p.enabled = 1
+      AND p.trigger_status = ?
+      AND (p.source_agent_id IS NULL OR p.source_agent_id = ?)
+      AND (p.trigger_cycle_type IS NULL OR p.trigger_cycle_type = ?)
+      AND (p.project_id IS NULL OR p.project_id = ?)
+      AND p.owner_id = (SELECT owner_id FROM agents WHERE id = ?)
+      AND p.owner_id = (SELECT owner_id FROM agents WHERE id = p.target_agent_id)
+      AND (p.project_id IS NULL OR p.owner_id = (SELECT owner_id FROM projects WHERE id = p.project_id))
   `,
     )
-    .all(status, agentId, cycleType, projectId ?? null) as any[];
+    .all(status, agentId, cycleType, projectId ?? null, agentId) as any[];
   return rows.map(pipelineRow);
 }
 

@@ -15,7 +15,7 @@ WORKDIR /app
 # (~170MB Chromium download), so it must sit ABOVE the app-deps copy — that way a change
 # to package.json busts `npm install` without re-triggering the browser download.
 # Bump this pin whenever the `playwright` version in package.json changes.
-RUN npx --yes playwright@1.59.1 install --with-deps chromium
+RUN npx --yes playwright@1.64.1 install --with-deps chromium
 
 # Install Node dependencies (layer-cached — only re-runs when package*.json changes)
 COPY package*.json ./

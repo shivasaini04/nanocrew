@@ -5,9 +5,9 @@ the Docker socket, which is root-equivalent on the machine.
 
 ## Checklist
 
-1. A Linux host with Docker and Compose, 2 vCPU and 4 GB RAM or more.
+1. A Linux host with Docker and Compose, 2 vCPU and 4 GB RAM or more, and at least 20 GB of free build disk.
 2. Clone the repo, create `.env`, set strong values for `ADMIN_PASSWORD`, `SESSION_SECRET`,
-   `SESSION_ENCRYPTION_KEY` and `LITELLM_PROXY_KEY`. Set `SIGNUP_OPEN=false` unless you want public sign-ups.
+   `SESSION_ENCRYPTION_KEY`, `nanocrew_SECRET_KEY` and `LITELLM_PROXY_KEY`. Set `SIGNUP_OPEN=false` unless you want public sign-ups.
 3. Set `HOST_PROJECT_ROOT` to the absolute checkout path and `APP_URL` to your public URL.
 4. Build and start:
    ```bash
@@ -16,7 +16,8 @@ the Docker socket, which is root-equivalent on the machine.
    docker compose up -d --build
    ```
 5. Put a reverse proxy with TLS (Caddy, nginx, Traefik) in front of port 3002. Do not expose port 4000 (the model
-   gateway) publicly.
+   gateway) publicly. Compose binds both ports to `127.0.0.1`; a reverse proxy running on the host can reach them.
+   For a containerized reverse proxy, connect it to the Compose network and use `nanocrew-orchestrator:3002`.
 6. Back up `data/` and `store/`. They hold the database and encrypted secrets.
 7. Set `GLOBAL_DAILY_BUDGET_USD` so a runaway agent cannot spend without limit.
 

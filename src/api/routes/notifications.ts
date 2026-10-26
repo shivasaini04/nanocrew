@@ -7,7 +7,9 @@ import {
   deleteNotification,
   clearAllNotifications,
   createNotification,
+  getAgent,
 } from '../../db.js';
+import { ownsResource } from '../middleware/ownership.js';
 
 export const notificationsRouter = Router();
 
@@ -17,12 +19,16 @@ notificationsRouter.post('/', (req, res) => {
     const { type, title, body, agent_id, meta } = req.body ?? {};
     if (!type || !title)
       return res.status(400).json({ error: 'type and title are required' });
+    if (agent_id && !ownsResource(req, getAgent(agent_id)?.owner_id)) {
+      return res.status(404).json({ error: 'Not found' });
+    }
     const notif = createNotification({
       type,
       title,
       body: body ?? '',
       agent_id: agent_id ?? null,
       meta: meta ?? null,
+      owner_id: req.user!.id,
     });
     res.json(notif);
   } catch (err: any) {

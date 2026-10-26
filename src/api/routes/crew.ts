@@ -5,6 +5,7 @@ import {
   getCrewGraphEdges,
   getProjectMemberships,
   getCompletedCycleCounts,
+  listProjects,
 } from '../../db.js';
 import { filterOwned } from '../middleware/ownership.js';
 
@@ -15,8 +16,16 @@ export const crewRouter = Router();
 crewRouter.get('/graph', (req, res) => {
   try {
     const agents = filterOwned(req as Request, agentService.getAllAgents());
-    const edges = getCrewGraphEdges();
-    const memberships = getProjectMemberships();
+    const agentIds = new Set(agents.map((a) => a.id));
+    const projectIds = new Set(
+      filterOwned(req, listProjects()).map((p) => p.id),
+    );
+    const edges = getCrewGraphEdges().filter(
+      (edge) => agentIds.has(edge.from) && agentIds.has(edge.to),
+    );
+    const memberships = getProjectMemberships().filter(
+      (m) => agentIds.has(m.agent_id) && projectIds.has(m.project_id),
+    );
     const cycleCounts = getCompletedCycleCounts();
 
     // Build project→agents map for cluster layout
@@ -43,7 +52,11 @@ crewRouter.get('/graph', (req, res) => {
         emoji: a.emoji,
         status: a.status,
         color: a.config.personality?.color ?? null,
-        parent_agent_id: (a as any).parent_agent_id ?? null,
+        parent_agent_id: (() => {
+          const parent = (a as typeof a & { parent_agent_id?: string })
+            .parent_agent_id;
+          return parent && agentIds.has(parent) ? parent : null;
+        })(),
         cycles: cycleCounts.get(a.id) ?? 0,
       })),
       edges,

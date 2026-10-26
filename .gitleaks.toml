@@ -1,0 +1,36 @@
+title = "NanoCrew secret scanning"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Deliberately fake credentials in DLP regression tests"
+condition = "AND"
+paths = ['''^container/nanoagent/tests/(test_security|test_effector_phase7_network_firewall)\.py$''']
+regexTarget = "secret"
+regexes = [
+  '''^ghp_123456789012345678901234567890123456$''',
+  '''^sk-proj123456789012345678901234567890$''',
+  '''^sk-proj-abc12345678901234567890$''',
+]
+
+[[allowlists]]
+description = "RFC 6238 public TOTP test vector"
+condition = "AND"
+paths = ['''^container/nanoagent/tests/test_effector_phase21_totp\.py$''']
+regexTarget = "secret"
+regexes = ['''^GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ$''']
+
+[[allowlists]]
+description = "Public ElevenLabs Eric voice identifier (not an API key)"
+condition = "AND"
+paths = ['''^container/nanoagent/nanoagent/skills/productivity-telephony/scripts/telephony\.py$''']
+regexTarget = "secret"
+regexes = ['''^cjVigY5qzO86Huf0OWal$''']
+
+[[allowlists]]
+description = "Short dummy key in the code-review skill's unsafe-code example"
+condition = "AND"
+paths = ['''^container/nanoagent/nanoagent/skills/code-review/SKILL\.md$''']
+regexTarget = "secret"
+regexes = ['''^sk-live-abc123$''']

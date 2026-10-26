@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, type Request } from 'express';
 import {
   getPipelines,
   getPipeline,
@@ -9,14 +9,38 @@ import {
   logPipelineRun,
   updatePipelineRunTarget,
   setRowOwner,
+  getAgent,
+  getProject,
 } from '../../db.js';
 import { agentService } from '../../agents/agent-registry.js';
 import type { CycleType } from '../../types.js';
 import { logger } from '../../logger.js';
-import { filterOwned, ownershipParam } from '../middleware/ownership.js';
+import {
+  filterOwned,
+  ownershipParam,
+  ownsResource,
+} from '../middleware/ownership.js';
 import { canWake } from '../../agents/wake-policy.js';
 
 export const pipelinesRouter = Router();
+
+function ownsPipelineReferences(
+  req: Request,
+  pipeline: {
+    source_agent_id?: string | null;
+    target_agent_id?: string | null;
+    project_id?: string | null;
+  },
+): boolean {
+  return (
+    !!pipeline.target_agent_id &&
+    ownsResource(req, getAgent(pipeline.target_agent_id)?.owner_id) &&
+    (!pipeline.source_agent_id ||
+      ownsResource(req, getAgent(pipeline.source_agent_id)?.owner_id)) &&
+    (!pipeline.project_id ||
+      ownsResource(req, getProject(pipeline.project_id)?.owner_id))
+  );
+}
 
 // Stage 28 — any /:id route is owner-guarded (pipelines use :id consistently).
 pipelinesRouter.param(
@@ -56,6 +80,15 @@ pipelinesRouter.post('/', (req, res) => {
   if (!name?.trim()) return res.status(400).json({ error: 'name required' });
   if (!target_agent_id?.trim())
     return res.status(400).json({ error: 'target_agent_id required' });
+  if (
+    !ownsPipelineReferences(req, {
+      source_agent_id,
+      target_agent_id,
+      project_id,
+    })
+  ) {
+    return res.status(404).json({ error: 'Not found' });
+  }
   try {
     const p = createPipeline({
       name: name.trim(),
@@ -95,6 +128,9 @@ pipelinesRouter.post('/:id/fire', (req, res) => {
     return res
       .status(400)
       .json({ error: 'Pipeline is disabled — enable it before manual fire.' });
+  if (!ownsPipelineReferences(req, p)) {
+    return res.status(404).json({ error: 'Not found' });
+  }
 
   const target = agentService.getAgent(p.target_agent_id);
   if (!target || !canWake(target, 'pipeline')) {
@@ -174,6 +210,9 @@ pipelinesRouter.post('/:id/fire', (req, res) => {
 pipelinesRouter.patch('/:id', (req, res) => {
   const p = getPipeline(req.params.id);
   if (!p) return res.status(404).json({ error: 'Pipeline not found' });
+  if (!ownsPipelineReferences(req, { ...p, ...req.body })) {
+    return res.status(404).json({ error: 'Not found' });
+  }
   try {
     updatePipeline(req.params.id, req.body);
     res.json(getPipeline(req.params.id));

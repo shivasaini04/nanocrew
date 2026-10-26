@@ -44,12 +44,12 @@ Runtime dependencies are installed from npm and PyPI and keep their own licenses
 
 ### Dependencies with copyleft or unusual licenses
 
-Checked 18 Oct 2026 with `license-checker` (npm) and `pip-licenses` (Python). Everything else is MIT, Apache-2.0, BSD,
-ISC or similar.
+Initially checked 18 Oct 2026 with `license-checker` (npm) and `pip-licenses` (Python); the Baileys entry was updated
+26 Oct for rc14. Other dependencies use MIT, Apache-2.0, BSD, ISC or similar licenses.
 
 | Dependency | License | Note |
 |---|---|---|
-| `@whiskeysockets/libsignal-node` | GPL-3.0 | Pulled in by Baileys (MIT), which powers the optional WhatsApp channel. Not copied into this repo; npm installs it. If GPL-3.0 does not suit your use, do not enable WhatsApp, or remove the Baileys dependency. |
+| `libsignal` | GPL-3.0 | Pulled in by Baileys (MIT), which powers the optional WhatsApp channel. Not copied into this repo; npm installs it. If GPL-3.0 does not suit your use, remove the Baileys dependency before installing or distributing dependencies. |
 | `sharp` (libvips binaries) | LGPL-3.0-or-later | Prebuilt image library, used as a normal dynamic dependency. |
 | `python-telegram-bot` | LGPL-3.0 | Used as a library by the Telegram channel. |
 | `lark-oapi` | MIT (licence file in the wheel; package metadata leaves the field blank) | Used by the optional Feishu channel. |

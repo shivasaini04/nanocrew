@@ -17,9 +17,10 @@
 set -uo pipefail
 
 IMAGE="${AGENT_IMAGE:-nanocrew-agent:latest}"
-ENV_FILE="${ENV_FILE:-/opt/nanocrew/nanocrew-main/.env}"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ENV_FILE="${ENV_FILE:-$PROJECT_ROOT/.env}"
 NETWORK="${DOCKER_NETWORK:-nanocrew_default}"
-SRC="${NANOAGENT_SRC:-/opt/nanocrew/nanocrew-main/container/nanoagent}"
+SRC="${NANOAGENT_SRC:-$PROJECT_ROOT/container/nanoagent}"
 WS="${KEEP_DIR:-$(mktemp -d /tmp/desktop-bench.XXXXXX)}"
 
 die() { printf 'abort: %s\n' "$1" >&2; exit 2; }
