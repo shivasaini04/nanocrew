@@ -52,7 +52,7 @@ jobs:
 
       - name: Image processing and approval regression tests
         run: |
-          docker run --rm --user 0:0 -v "$PWD/container/nanoagent/tests:/tests:ro" --entrypoint sh nanocrew-agent:latest -c 'python -m pip install --quiet "pytest>=9,<10" "pytest-asyncio>=1.3,<2" && python -m pytest -q /tests/test_effector_stage61_pixel_elements.py /tests/test_effector_phase8_vision_and_danger_gate.py'
+          docker run --rm --user 0:0 -v "$PWD/container/nanoagent/tests:/app/nanoagent/tests:ro" --entrypoint sh nanocrew-agent:latest -c 'python -m pip install --quiet "pytest>=9,<10" "pytest-asyncio>=1.3,<2" && python -m pytest -q -o cache_dir=/tmp/pytest-cache /app/nanoagent/tests/test_effector_stage61_pixel_elements.py /app/nanoagent/tests/test_effector_phase8_vision_and_danger_gate.py'
 
       - name: Agent image can make an LLM call (local stand-in, no key)
         # --user 0:0 as the orchestrator starts agent containers (Docker-out-of-Docker).
@@ -85,9 +85,9 @@ jobs:
         run: curl -fsS http://localhost:3002/ | grep -qi "<div id=\"root\"\|<html"
 
       - name: Logs on failure
-        if: failure()
+        if: failure() && hashFiles('.env') != ''
         run: docker compose logs --no-color --tail 200
 
       - name: Tear down
-        if: always()
+        if: always() && hashFiles('.env') != ''
         run: docker compose down -v
