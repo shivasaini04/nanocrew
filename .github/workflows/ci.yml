@@ -7,6 +7,21 @@ on:
     branches: [main]
 
 jobs:
+  python-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v10.3.2
+        with:
+          version: '0.13.5'
+          python-version: '3.12'
+      - name: Audit the locked Python runtime dependencies
+        working-directory: container/nanoagent
+        run: |
+          uv lock --check
+          uv export --frozen --no-dev --no-emit-project --format requirements-txt --output-file requirements-audit.txt
+          uv tool run pip-audit --disable-pip --require-hashes -r requirements-audit.txt
+
   ci:
     runs-on: ubuntu-latest
     steps:

@@ -34,11 +34,25 @@ jobs:
           node-version: 20
           cache: npm
 
+      - uses: astral-sh/setup-uv@v10.3.2
+        with:
+          version: '0.13.5'
+          python-version: '3.12'
+
       - name: Build the agent image
         run: bash container/build.sh
 
       - name: Agent image can import its own code
         run: docker run --rm --entrypoint python nanocrew-agent:latest -c "import nanoagent; print('nanoagent import ok')"
+
+      - name: Audit installed Python runtime dependencies
+        run: |
+          docker run --rm --entrypoint python nanocrew-agent:latest -m pip freeze --exclude nanoagent-ai > image-requirements.txt
+          uv tool run pip-audit --disable-pip --no-deps -r image-requirements.txt
+
+      - name: Image processing and approval regression tests
+        run: |
+          docker run --rm --user 0:0 -v "$PWD/container/nanoagent/tests:/tests:ro" --entrypoint sh nanocrew-agent:latest -c 'python -m pip install --quiet "pytest>=9,<10" "pytest-asyncio>=1.3,<2" && python -m pytest -q /tests/test_effector_stage61_pixel_elements.py /tests/test_effector_phase8_vision_and_danger_gate.py'
 
       - name: Agent image can make an LLM call (local stand-in, no key)
         # --user 0:0 as the orchestrator starts agent containers (Docker-out-of-Docker).

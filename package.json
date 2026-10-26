@@ -1,6 +1,6 @@
 {
   "name": "nanocrew",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Self-hosted crew of AI agents with Docker sandboxes, memory, schedules, handoffs and approvals.",
   "license": "MIT",
   "repository": {

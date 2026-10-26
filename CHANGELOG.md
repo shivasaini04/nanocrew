@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1 (26 Oct 2026)
+
+Security patch after GitHub's first Python dependency-graph scan:
+
+- Raise the Pillow constraint to 13.x, fixing the image decoder/encoder advisories affecting the old 11.x pin.
+- Raise security floors and refresh the Python lock for MCP, aiohttp, PyJWT, filelock, certifi, multidict and urllib3.
+- Retain the published `v0.1.0` tag; use `v0.1.1` or current main for the dependency fixes.
+
 ## 0.1.0 (26 Oct 2026)
 
 First public release. Multi-agent orchestrator, React dashboard, sandboxed Python agent runtime, LiteLLM model

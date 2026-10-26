@@ -54,7 +54,7 @@ dependencies = [
     "qq-botpy>=1.2.0,<2.0.0",
     "python-socks[asyncio]>=2.8.0,<3.0.0",
     "prompt-toolkit>=3.0.50,<4.0.0",
-    "mcp>=1.26.0,<2.0.0",
+    "mcp>=1.30.0,<2.0.0",
     "json-repair>=0.57.0,<1.0.0",
     "rank-bm25>=0.2.2,<1.0.0",
     "fastapi>=0.115.0,<1.0.0",
@@ -62,7 +62,7 @@ dependencies = [
     # Effector (stage43) — OCR fallback layer of the element resolver. tesseract-ocr
     # is the matching system package, installed in container/Dockerfile.
     "pytesseract>=0.3.13,<1.0.0",
-    "Pillow>=11.0.0,<12.0.0",
+    "Pillow>=13.0.0,<14.0.0",
     "playwright>=1.62.0",
     # Voice (agent/voice) — outbound calling.
     # pytz: the TRAI 9am-9pm calling window is defined in IST, and the gate that
@@ -74,7 +74,13 @@ dependencies = [
     "google-genai>=0.3.0",
     # Used by agent/voice's HTTP paths (company profile fetch, engine calls). Already
     # present transitively via litellm; declared because voice imports it directly.
-    "aiohttp>=3.9.3",
+    "aiohttp>=3.14.4",
+    # Security floors for transitive dependencies, also resolved in uv.lock.
+    "PyJWT>=2.15.0,<3.0.0",
+    "filelock>=4.2.1,<5.0.0",
+    "certifi>=2026.10.19",
+    "multidict>=6.9.1,<7.0.0",
+    "urllib3>=2.8.0,<3.0.0",
     # Effector Inlined Native Engine (our Camoufox fork — agent/effector/engine/).
     # Vendored deliberately rather than pip-installed: we intend to modify the engine
     # (AI-driven control, new capabilities), so it is ours to change. That means its
