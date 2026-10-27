@@ -10,7 +10,9 @@ web dashboard.
 [![Docker quickstart](https://github.com/shivasaini04/nanocrew/actions/workflows/docker.yml/badge.svg)](https://github.com/shivasaini04/nanocrew/actions/workflows/docker.yml)
 [![Secret scan](https://github.com/shivasaini04/nanocrew/actions/workflows/secrets.yml/badge.svg)](https://github.com/shivasaini04/nanocrew/actions/workflows/secrets.yml)
 
-**[Watch the NanoCrew launch film (~66 seconds)](https://github.com/shivasaini04/nanocrew/releases/download/v0.1.1/nanocrew_film_4x5_X-LinkedIn_1080x1350.mp4)**
+### Watch the NanoCrew launch film
+
+https://github.com/user-attachments/assets/5d2caeeb-12d3-4caa-bfe7-13bc76954cd2
 
 <p align="center">
   <img src="docs/images/dashboard-command-center.png" alt="The NanoCrew command center: your crew of agents, their status, spend and recent work" width="900">
