@@ -119,17 +119,21 @@ describe('customize', () => {
     // Modify the tracked file
     fs.writeFileSync(trackedFile, 'export const x = 2;');
 
-    // Make the base file a directory to cause diff to exit with code 2
-    const baseFilePath = path.join(
-      tmpDir,
-      '.NanoCrew',
-      'base',
-      'src',
-      'app.ts',
-    );
-    fs.mkdirSync(baseFilePath, { recursive: true });
-
-    expect(() => commitCustomize()).toThrow(/diff error/i);
+    // Put a `diff` that exits 2 first on PATH. The test used to make the base file a directory and
+    // rely on the real diff failing, but GNU diffutils 3.11+ no longer errors there (it exits 1 and
+    // prints a patch), so the outcome depended on the diffutils version of the machine.
+    const fakeBin = path.join(tmpDir, 'fake-bin');
+    fs.mkdirSync(fakeBin, { recursive: true });
+    fs.writeFileSync(path.join(fakeBin, 'diff'), '#!/bin/sh\nexit 2\n', {
+      mode: 0o755,
+    });
+    const originalPath = process.env.PATH;
+    process.env.PATH = `${fakeBin}${path.delimiter}${originalPath}`;
+    try {
+      expect(() => commitCustomize()).toThrow(/diff error/i);
+    } finally {
+      process.env.PATH = originalPath;
+    }
   });
 
   it('startCustomize while active throws', () => {
